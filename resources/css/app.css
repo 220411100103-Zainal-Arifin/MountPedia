@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-display:
+        "Bebas Neue", "League Gothic", "Arial Narrow", Impact, sans-serif;
+    --font-sans:
+        "Roboto", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+        sans-serif;
+
+    --color-pine-50: #f1f6f2;
+    --color-pine-100: #e2eee6;
+    --color-pine-200: #c7dccf;
+    --color-pine-300: #9fc2ad;
+    --color-pine-600: #2a7452;
+    --color-pine-700: #1f5a40;
+    --color-pine-800: #17432f;
+    --color-pine-900: #0f2e21;
+    --color-pine-950: #081a13;
+
+    --color-paper: #f5f6f1;
+    --color-ink: #14211a;
+    --color-ink-soft: #5a675f;
+    --color-line: #dde3dc;
+    --color-gold: #f4b43a;
+}
+
+/* ---------- Leaflet (di luar @layer agar menang atas CSS bawaan Leaflet) ---------- */
+.leaflet-container {
+    font-family: var(--font-sans);
+    background: #dfe9e2;
+}
+.leaflet-popup-content-wrapper {
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(8, 26, 19, 0.25);
+}
+.leaflet-popup-content {
+    margin: 14px 18px;
+    line-height: 1.4;
+}
+.leaflet-bar {
+    border: 0 !important;
+    box-shadow: 0 6px 18px rgba(8, 26, 19, 0.2) !important;
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+.leaflet-bar a {
+    color: #17432f;
+}
+.leaflet-control-attribution {
+    font-size: 10px;
+}

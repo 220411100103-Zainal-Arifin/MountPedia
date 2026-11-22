@@ -1,0 +1,652 @@
+/* ==========================================================================
+   Halaman Daftar Gunung (Mountain Explorer)
+   Variabel & reset bersama ada di layout.css
+   ========================================================================== */
+.explorer {
+    --green-900: #0f2e21;
+    --green-800: #17432f;
+    --green-700: #1f5a40;
+    --green-100: #e2eee6;
+    --paper: #f5f6f1;
+    --ink: #14211a;
+    --ink-soft: #5a675f;
+    --line: #dde3dc;
+    --radius: 18px;
+    --gutter: clamp(14px, 1.8vw, 26px);
+
+    background: var(--paper);
+    color: var(--ink);
+    padding: clamp(44px, 7vw, 96px) 0 clamp(64px, 9vw, 120px);
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ---------- Header ---------- */
+.explorer__head {
+    margin-bottom: clamp(36px, 5vw, 64px);
+}
+.eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--green-700);
+}
+.eyebrow::before {
+    content: "";
+    width: 28px;
+    height: 2px;
+    background: var(--green-700);
+}
+.explorer__title {
+    max-width: 13ch;
+    margin: 16px 0 20px;
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(52px, 8vw, 112px);
+    line-height: 0.94;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    color: var(--green-900);
+}
+.explorer__lead {
+    max-width: 58ch;
+    margin: 0;
+    font-size: clamp(15px, 1.2vw, 17px);
+    line-height: 1.7;
+    color: var(--ink-soft);
+}
+
+/* ---------- Pencarian & filter ---------- */
+.explorer__filters form {
+    display: grid;
+    gap: 14px;
+}
+.search {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 6px 6px 20px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    transition:
+        border-color 0.25s,
+        box-shadow 0.25s;
+}
+.search:focus-within {
+    border-color: var(--green-700);
+    box-shadow: 0 0 0 4px rgba(31, 90, 64, 0.12);
+}
+.search > svg {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    color: var(--ink-soft);
+}
+.search input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 0;
+    font: inherit;
+    font-size: 16px;
+    color: var(--ink);
+    background: none;
+    border: 0;
+    outline: 0;
+}
+.search input::placeholder {
+    color: #8a968e;
+}
+.search input::-webkit-search-cancel-button {
+    cursor: pointer;
+}
+.search__btn {
+    flex: none;
+    padding: 12px 28px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--green-800);
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.25s;
+}
+.search__btn:hover {
+    background: var(--green-900);
+}
+.search__btn:focus-visible,
+.select select:focus-visible {
+    outline: 2px solid var(--green-700);
+    outline-offset: 2px;
+}
+
+.filters__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 14px;
+}
+.select select {
+    appearance: none;
+    -webkit-appearance: none;
+    min-width: 200px;
+    padding: 12px 44px 12px 20px;
+    font: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2355635b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    cursor: pointer;
+    transition:
+        border-color 0.25s,
+        background-color 0.25s;
+}
+.select select:hover {
+    border-color: var(--green-700);
+}
+.select select.is-active {
+    color: var(--green-900);
+    background-color: var(--green-100);
+    border-color: var(--green-700);
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+.chip {
+    position: relative;
+    cursor: pointer;
+}
+.chip input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+.chip span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 18px;
+    font-size: 13px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    transition:
+        background 0.25s,
+        color 0.25s,
+        border-color 0.25s;
+}
+.chip:hover span {
+    border-color: var(--green-700);
+}
+.chip input:checked + span {
+    color: #fff;
+    background: var(--green-800);
+    border-color: var(--green-800);
+}
+.chip input:focus-visible + span {
+    outline: 2px solid var(--green-700);
+    outline-offset: 2px;
+}
+
+/* titik status (dipakai chip dan badge kartu) */
+.dot {
+    display: inline-block;
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #9aa5b1;
+}
+[data-status="buka"] > .dot,
+.dot[data-status="buka"] {
+    background: #4ade80;
+}
+[data-status="tutup"] > .dot,
+.dot[data-status="tutup"] {
+    background: #f87171;
+}
+[data-status="dibatasi"] > .dot,
+.dot[data-status="dibatasi"] {
+    background: var(--gold);
+}
+
+/* ---------- Bar hasil ---------- */
+.explorer__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 20px;
+    margin: clamp(32px, 4vw, 48px) 0 22px;
+    font-size: 14px;
+    color: var(--ink-soft);
+}
+.count strong {
+    font-weight: 700;
+    color: var(--ink);
+}
+.reset {
+    font-weight: 500;
+    color: var(--green-700);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+.reset:hover {
+    color: var(--green-900);
+}
+
+/* ---------- Masonry ---------- */
+.masonry {
+    column-count: 3;
+    column-gap: var(--gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.mx-item {
+    margin: 0 0 var(--gutter);
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+}
+.mx-card {
+    position: relative;
+    display: block;
+    aspect-ratio: var(--ratio, 4 / 5);
+    overflow: hidden;
+    isolation: isolate;
+    color: #fff;
+    background: #1b2a24;
+    border-radius: var(--radius);
+}
+.mx-card__media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-color: #1b2a24;
+    background-position: 50% 40%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    transition: transform 1s cubic-bezier(0.2, 0.7, 0.3, 1);
+    will-change: transform;
+}
+.mx-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+        180deg,
+        rgba(7, 16, 12, 0.3) 0%,
+        rgba(7, 16, 12, 0) 28%,
+        rgba(7, 16, 12, 0) 46%,
+        rgba(7, 16, 12, 0.8) 100%
+    );
+}
+.mx-card:hover .mx-card__media,
+.mx-card:focus-visible .mx-card__media {
+    transform: scale(1.06);
+}
+.mx-card:focus-visible {
+    outline: 3px solid var(--green-700);
+    outline-offset: 3px;
+}
+
+.mx-card__badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px 7px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(8, 16, 12, 0.42);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-radius: 999px;
+}
+.mx-card__body {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 18px;
+    display: grid;
+    gap: 10px;
+}
+.mx-card__name {
+    font-family: var(--display);
+    font-size: clamp(28px, 2.5vw, 40px);
+    line-height: 0.98;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+.mx-card__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+}
+.mx-card__place {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    opacity: 0.92;
+}
+.mx-card__place svg {
+    flex: none;
+    width: 14px;
+    height: 14px;
+}
+.mx-card__elev {
+    flex: none;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .mx-item {
+        animation: mx-in 0.8s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+        animation-delay: calc(var(--i, 0) * 50ms);
+    }
+}
+@keyframes mx-in {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+}
+
+/* ---------- Pagination ---------- */
+.pager {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    margin: clamp(32px, 4vw, 56px) auto 0;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+.pager__pages {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.pager__pages a,
+.pager__pages .is-current,
+.pager__gap,
+.pager__step {
+    display: grid;
+    place-items: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 4px;
+    font-size: 13px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 255, 255, 0.85);
+    border-radius: 999px;
+    transition:
+        background 0.25s,
+        color 0.25s;
+}
+.pager__pages a:hover,
+a.pager__step:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.16);
+}
+.pager__pages .is-current {
+    color: #1a1205;
+    background: var(--gold);
+}
+.pager__gap {
+    color: rgba(255, 255, 255, 0.5);
+}
+.pager__step svg {
+    width: 16px;
+    height: 16px;
+}
+.pager__step.is-disabled {
+    opacity: 0.35;
+}
+.pager a:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+
+/* ---------- Kosong ---------- */
+.empty {
+    padding: clamp(48px, 8vw, 96px) 0;
+    text-align: center;
+}
+.empty__title {
+    margin: 0 0 10px;
+    font-family: var(--display);
+    font-size: clamp(32px, 4vw, 48px);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--green-900);
+}
+.empty__text {
+    margin: 0 0 22px;
+    color: var(--ink-soft);
+}
+.empty__link {
+    display: inline-block;
+    padding: 12px 26px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--green-800);
+    border-radius: 999px;
+}
+
+/* ---------- Responsif ---------- */
+@media (min-width: 981px) {
+    .chips {
+        margin-left: auto;
+    }
+}
+@media (max-width: 980px) {
+    .masonry {
+        column-count: 2;
+    }
+}
+@media (max-width: 640px) {
+    .search {
+        padding-left: 16px;
+    }
+    .search__btn {
+        padding: 11px 20px;
+    }
+    .select {
+        flex: 1 1 100%;
+    }
+    .select select {
+        width: 100%;
+    }
+}
+@media (max-width: 520px) {
+    .masonry {
+        column-count: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mx-card__media,
+    .search,
+    .chip span,
+    .select select {
+        transition: none;
+    }
+}
+
+/* ==========================================================================
+   Latar foto gunung yang memudar ke warna solid + footer disembunyikan
+   ========================================================================== */
+.explorer {
+    --bg-solid: #0f2e21; /* diganti gunung.js sesuai warna dasar foto */
+    position: relative;
+    overflow: clip;
+    color: #eef3ec;
+    background: var(--bg-solid);
+    transition: background-color 0.4s;
+}
+.explorer__backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 0;
+    height: clamp(560px, 100vh, 1000px);
+    background-color: var(--bg-solid);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 50% 100%;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 45%, transparent 100%);
+}
+.explorer__backdrop::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(6, 12, 9, 0.45) 0%,
+        rgba(6, 12, 9, 0) 55%
+    );
+}
+.explorer > :not(.explorer__backdrop) {
+    position: relative;
+    z-index: 1;
+}
+
+.eyebrow {
+    color: #a9dcbc;
+}
+.eyebrow::before {
+    background: #a9dcbc;
+}
+.explorer__title {
+    color: #fff;
+    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.35);
+}
+.explorer__lead,
+.explorer__bar,
+.empty__text {
+    color: rgba(255, 255, 255, 0.82);
+}
+.count strong,
+.empty__title {
+    color: #fff;
+}
+.reset {
+    color: #a9dcbc;
+}
+.reset:hover {
+    color: #fff;
+}
+.chip span {
+    color: var(--ink);
+}
+.search {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+/* cadangan: sembunyikan footer layout bila belum memakai prop :footer */
+body:has(.explorer) .site-footer {
+    display: none;
+}
+
+/* ==========================================================================
+   Navbar transparan: memakai <x-site-nav :overlay="true"> (kelas .nav--overlay)
+   ========================================================================== */
+/* ruang untuk navbar yang melayang di atas halaman */
+.explorer {
+    padding-top: clamp(150px, 15vw, 200px);
+}
+
+/* ==========================================================================
+   Masonry rata bawah: kolom disusun gunung.js, tiap kolom diregangkan
+   sampai tingginya sama sehingga tidak ada ruang kosong di bawah
+   ========================================================================== */
+.masonry--js {
+    display: flex;
+    align-items: stretch;
+    column-count: auto;
+    gap: var(--gutter);
+}
+.mx-col {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+    list-style: none;
+}
+.mx-col__list {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--gutter);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.masonry--js .mx-item {
+    position: relative;
+    flex: 1 0 auto;
+    margin: 0;
+    aspect-ratio: var(--ratio, 4 / 5);
+}
+.masonry--js .mx-card {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+}

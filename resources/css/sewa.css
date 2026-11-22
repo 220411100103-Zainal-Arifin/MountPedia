@@ -1,0 +1,39 @@
+/* ==========================================================================
+   Halaman Sewa: memakai gunung.css + perlengkapan.css (kartu tanpa foto,
+   latar). Berkas ini hanya memuat selisihnya. Muat paling akhir.
+   ========================================================================== */
+
+/* badge "Terverifikasi" */
+.mx-card__badge[data-tone="verified"] > .dot {
+    background: #4ade80;
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.22);
+}
+
+/* baris info tambahan di kartu toko */
+.mx-card__line {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.72);
+}
+.mx-card__line strong {
+    color: var(--gold);
+    font-weight: 500;
+}
+
+/* nama toko bisa panjang: tetap rapi di dua baris */
+.mx-card__name {
+    overflow-wrap: anywhere;
+}
+
+/* kartu toko memuat lebih banyak teks: tempatkan ikon di bagian atas agar tidak tertimpa teks */
+.mx-card--empty .mx-card__media {
+    place-items: start center;
+    padding-top: 22%;
+}
+.mx-card--empty .mx-card__icon {
+    width: 30%;
+    max-width: 110px;
+    margin-bottom: 0;
+}

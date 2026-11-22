@@ -1,0 +1,264 @@
+/* ==========================================================================
+   Layout bersama: variabel, reset, navbar, footer
+   ========================================================================== */
+:root {
+    --gold: #f4b43a;
+    --display:
+        "Bebas Neue", "League Gothic", "Oswald", "Arial Narrow", Impact,
+        sans-serif;
+    --body: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --pad-x: clamp(16px, 3vw, 48px);
+}
+
+/* Di dalam @layer base supaya tidak mengalahkan utilitas Tailwind (text-*, bg-*, dst.) */
+@layer base {
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+    html,
+    body {
+        margin: 0;
+        background: #0a0f15;
+        color: #fff;
+        font-family: var(--body);
+    }
+    button {
+        font: inherit;
+        color: inherit;
+    }
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+}
+
+/* max-width: none menimpa .container bawaan Tailwind (yang membatasi 640/768/1024px) */
+.container {
+    width: min(1200px, 100% - 2 * var(--pad-x));
+    max-width: none;
+    margin-inline: auto;
+}
+
+/* ---------- Navbar ---------- */
+.nav {
+    position: relative;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(18px, 3.4vh, 36px) var(--pad-x);
+    background: #0a0f15;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+/* varian transparan di atas hero */
+.nav--overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-bottom: 0;
+    background: none;
+    border-bottom: 0;
+}
+
+.nav__brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+}
+.nav__brand .nav__logo {
+    height: 30px;
+    width: auto;
+}
+.nav__word-b {
+    color: var(--gold);
+}
+/* menu di seberang logo (kanan), bukan di tengah */
+.nav__menu {
+    margin-left: auto;
+}
+.nav__links {
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 2.2vw, 36px);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.nav__links a {
+    position: relative;
+    display: block;
+    padding: 6px 0;
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+.nav__links a:hover {
+    opacity: 1;
+}
+.nav__links a[aria-current="page"]::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 2px;
+    background: var(--gold);
+}
+.nav__tools {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin-left: clamp(16px, 2.4vw, 40px);
+}
+.nav__icon {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+.nav__icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* tombol hamburger (hanya di layar kecil) */
+.nav__toggle {
+    display: none;
+    position: relative;
+    z-index: 10;
+    width: 36px;
+    height: 36px;
+}
+.nav__toggle span {
+    position: absolute;
+    left: 7px;
+    right: 7px;
+    height: 2px;
+    border-radius: 2px;
+    background: #fff;
+    transition:
+        transform 0.35s cubic-bezier(0.65, 0.05, 0.2, 1),
+        opacity 0.2s;
+}
+.nav__toggle span:nth-child(1) {
+    top: 11px;
+}
+.nav__toggle span:nth-child(2) {
+    top: 17px;
+}
+.nav__toggle span:nth-child(3) {
+    top: 23px;
+}
+.nav.is-open .nav__toggle span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+}
+.nav.is-open .nav__toggle span:nth-child(2) {
+    opacity: 0;
+}
+.nav.is-open .nav__toggle span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+}
+
+@media (max-width: 900px) {
+    .nav__tools {
+        margin-left: auto;
+        gap: 10px;
+    }
+    .nav__toggle {
+        display: block;
+    }
+    .nav__brand {
+        position: relative;
+        z-index: 10;
+    }
+
+    .nav__menu {
+        position: fixed;
+        inset: 0;
+        z-index: 9;
+        display: flex;
+        align-items: center;
+        margin-left: 0;
+        padding: 90px var(--pad-x) 40px;
+        background: rgba(8, 12, 18, 0.94);
+        -webkit-backdrop-filter: blur(14px);
+        backdrop-filter: blur(14px);
+        opacity: 0;
+        visibility: hidden;
+        transition:
+            opacity 0.35s ease,
+            visibility 0s linear 0.35s;
+    }
+    .nav.is-open .nav__menu {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.35s ease;
+    }
+    .nav__links {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        margin: 0;
+    }
+    .nav__links li {
+        overflow: hidden;
+    }
+    .nav__links a {
+        padding: 8px 0;
+        font-family: var(--display);
+        font-size: clamp(26px, 7vw, 38px);
+        font-weight: 400;
+        line-height: 1.1;
+        letter-spacing: 0.05em;
+        opacity: 1;
+        transform: translateY(105%);
+        transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1);
+    }
+    .nav.is-open .nav__links a {
+        transform: none;
+    }
+    .nav.is-open .nav__links li:nth-child(2) a {
+        transition-delay: 0.06s;
+    }
+    .nav.is-open .nav__links li:nth-child(3) a {
+        transition-delay: 0.12s;
+    }
+    .nav.is-open .nav__links li:nth-child(4) a {
+        transition-delay: 0.18s;
+    }
+    .nav.is-open .nav__links li:nth-child(5) a {
+        transition-delay: 0.24s;
+    }
+    .nav__links a[aria-current="page"]::after {
+        bottom: 2px;
+    }
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+    padding: 36px var(--pad-x);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nav__toggle span,
+    .nav__menu,
+    .nav__links a {
+        transition: none;
+    }
+}
