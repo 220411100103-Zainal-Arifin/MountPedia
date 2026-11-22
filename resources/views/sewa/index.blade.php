@@ -1,5 +1,5 @@
 @php
-    // toko memuat banyak teks: hanya rasio tinggi yang dipakai
+    
     $ratios = ['4 / 5', '3 / 4', '1 / 1'];
     $tones = ['#1f5a40', '#2b4f6b', '#6b4a2b', '#4c3a6b', '#6b2b3a', '#2b6b64'];
     $storeIcon = '<path d="M3 9l1.5-5h15L21 9"/><path d="M3 9a3 3 0 006 0 3 3 0 006 0 3 3 0 006 0"/><path d="M5 12v8h14v-8M10 20v-5h4v5"/>';

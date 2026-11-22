@@ -1,19 +1,16 @@
-/* ==========================================================================
-   Halaman utama: hero slider gunung
-   Variabel & reset bersama (termasuk --pad-x) ada di layout.css
-   ========================================================================== */
+
 :root {
     --gap: clamp(12px, 1.5vw, 24px);
     --ctl-bottom: max(6vh, 40px);
     --ctl-size: clamp(34px, 3.4vw, 48px);
 }
 
-/* ---------- Kerangka & lapisan ---------- */
+
 .hero {
-    /* diisi home.js: kartu penuh + sisa pecahan yang terpotong tepi layar */
+    
     --cards: 3.4;
     --gaps: 3;
-    /* area kartu = 58vw (dari 42vw sampai tepi kanan layar) */
+    
     --card-w: calc((58vw - var(--gaps) * var(--gap)) / var(--cards));
     --card-h: clamp(240px, calc(var(--card-w) * 1.5), 360px);
 
@@ -71,7 +68,7 @@
         );
 }
 
-/* ---------- Konten kiri ---------- */
+
 .hero__content {
     position: absolute;
     z-index: 5;
@@ -207,9 +204,7 @@
     color: #0a0f15;
 }
 
-/* ---------- Deretan kartu ----------
-   Deretan mulai di 42vw dan berjalan sampai mepet tepi layar; kartu terakhir
-   sengaja terpotong tepi (lebar kartu dihitung di .hero dari --cards). */
+
 .hero__cards {
     position: absolute;
     z-index: 5;
@@ -217,7 +212,7 @@
     right: 0;
     bottom: calc(var(--ctl-bottom) + var(--ctl-size) + 28px);
     height: var(--card-h);
-    /* potong hanya di kiri; kanan dipotong tepi layar, atas-bawah lepas untuk bayangan dan hover */
+    
     clip-path: inset(-60px 0 -60px -8px);
 }
 .hero__track {
@@ -293,7 +288,7 @@
     text-transform: uppercase;
 }
 
-/* ---------- Kontrol bawah ---------- */
+
 .hero__controls {
     position: absolute;
     z-index: 5;
@@ -344,7 +339,7 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* ---------- Responsif ---------- */
+
 @media (max-width: 900px) {
     .nav__tools {
         margin-left: auto;
@@ -358,7 +353,7 @@
         z-index: 10;
     }
 
-    /* menu layar penuh */
+    
     .nav__menu {
         position: fixed;
         inset: 0;

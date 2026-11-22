@@ -13,7 +13,7 @@ class TrailStatusSeeder extends Seeder
     {
         TrailStatusLog::query()->delete();
 
-        // Satu status "buka" tingkat gunung untuk setiap gunung (trail_id kosong).
+        
         foreach (Mountain::all() as $mountain) {
             TrailStatusLog::create([
                 'mountain_id' => $mountain->id,
@@ -28,7 +28,7 @@ class TrailStatusSeeder extends Seeder
             ]);
         }
 
-        // Contoh riwayat: penutupan yang sudah berakhir (tidak boleh tampil sebagai status terkini).
+        
         if ($rinjani = Mountain::where('slug', 'rinjani')->first()) {
             TrailStatusLog::create([
                 'mountain_id' => $rinjani->id,
@@ -42,7 +42,7 @@ class TrailStatusSeeder extends Seeder
             ]);
         }
 
-        // Contoh pengujian: status tingkat jalur menimpa status gunung.
+        
         $lawu = Mountain::where('slug', 'lawu')->first();
         $trail = $lawu ? Trail::where('mountain_id', $lawu->id)->where('slug', 'cemoro-kandang')->first() : null;
 

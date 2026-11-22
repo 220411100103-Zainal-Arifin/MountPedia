@@ -1,11 +1,12 @@
 /* ==========================================================================
    Detail Tempat Sewa: navigasi sticky (scrollspy), filter katalog,
-   lightbox foto, "tampilkan semua ulasan", dan peta Leaflet.
+   lightbox foto (lightbox.js), "tampilkan semua ulasan", dan peta Leaflet.
    Semua bagian bersifat tambahan: halaman tetap terbaca tanpa JS.
    Perlu:  npm i leaflet
    ========================================================================== */
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { initLightbox } from "./lightbox.js";
 
 /* ---------- Scrollspy untuk navigasi sticky ---------- */
 (() => {
@@ -87,55 +88,7 @@ import "leaflet/dist/leaflet.css";
 })();
 
 /* ---------- Lightbox foto ---------- */
-(() => {
-    const box = document.querySelector("[data-lightbox]");
-    if (!box || typeof box.showModal !== "function") return;
-
-    let photos = [];
-    try {
-        photos = JSON.parse(box.dataset.photos || "[]");
-    } catch (e) {
-        photos = [];
-    }
-    if (!photos.length) return;
-
-    const img = box.querySelector("[data-lightbox-img]");
-    const caption = box.querySelector("[data-lightbox-caption]");
-    let index = 0;
-
-    const show = (i) => {
-        index = (i + photos.length) % photos.length;
-        img.src = photos[index].url;
-        img.alt = photos[index].caption || "";
-        caption.textContent =
-            photos[index].caption || `${index + 1} / ${photos.length}`;
-    };
-
-    document.querySelectorAll("[data-lightbox-open]").forEach((btn) =>
-        btn.addEventListener("click", () => {
-            show(parseInt(btn.dataset.lightboxOpen, 10) || 0);
-            box.showModal();
-        }),
-    );
-    box.querySelector("[data-lightbox-close]").addEventListener("click", () =>
-        box.close(),
-    );
-    box.querySelector("[data-lightbox-prev]").addEventListener("click", () =>
-        show(index - 1),
-    );
-    box.querySelector("[data-lightbox-next]").addEventListener("click", () =>
-        show(index + 1),
-    );
-    box.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowLeft") show(index - 1);
-        if (e.key === "ArrowRight") show(index + 1);
-    });
-    // klik di area gelap menutup
-    box.addEventListener("click", (e) => {
-        if (e.target === box || e.target.classList.contains("lightbox__figure"))
-            box.close();
-    });
-})();
+initLightbox();
 
 /* ---------- Ulasan: tampilkan semua ---------- */
 (() => {

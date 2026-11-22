@@ -1,7 +1,4 @@
-/* Ilustrasi pemandangan gunung (SVG) yang dibuat di browser.
-   Algoritma dan palet sama dengan hero beranda (home.js), sehingga gunung
-   yang sama tampil identik di kedua halaman. Slug yang belum punya palet
-   memakai salah satu palet bawaan secara stabil (berdasarkan hash slug). */
+
 
 const PALETTES = {
     semeru: {
@@ -104,14 +101,14 @@ function ridge(r, o) {
     return { d: "M0 1000 L" + pts.join(" L") + " L1600 1000 Z", apex };
 }
 
-// warna solid dasar ilustrasi: ridge terdepan setelah lapisan gelap 18% di dasar
+
 const shade = (hex, k) => {
     const n = parseInt(hex.slice(1), 16);
     const c = [n >> 16, (n >> 8) & 255, n & 255].map((v) => Math.round(v * k));
     return "rgb(" + c.join(",") + ")";
 };
 
-/** @returns {{uri: string, peakPct: number, bottom: string}} data-URI SVG, posisi puncak (persen lebar), warna dasar */
+
 export function sceneFor(slug) {
     slug = String(slug || "");
     const key = PALETTES[slug]
@@ -169,7 +166,7 @@ export function sceneFor(slug) {
     svg +=
         '<rect x="0" y="880" width="1600" height="120" fill="#000" opacity=".18"/>';
 
-    // kepulan hanya untuk gunung yang memang punya palet berkepulan (Semeru)
+    
     if (pal.plume && key === slug) {
         for (let i = 0; i < 7; i++) {
             svg += `<circle cx="${(apex[0] + i * 26 + r() * 10).toFixed(0)}" cy="${(apex[1] - 8 - i * 42).toFixed(0)}" r="${24 + i * 15}" fill="${pal.plume}" opacity="${(0.55 - i * 0.06).toFixed(2)}" filter="url(#b)"/>`;

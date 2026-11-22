@@ -20,6 +20,10 @@ export default defineConfig({
                 "resources/js/mountain-detail.js",
                 "resources/css/sewa-detail.css",
                 "resources/js/sewa-detail.js",
+                "resources/css/admin.css",
+                "resources/js/admin.js",
+                "resources/css/gear-detail.css",
+                "resources/js/gear-detail.js",
             ],
             refresh: true,
             fonts: [

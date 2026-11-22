@@ -1,9 +1,4 @@
-{{--
-    Satu jalur pendakian sebagai kartu horizontal.
-    $trail  : model Trail (dengan relasi campsites)
-    $summit : ketinggian puncak (mdpl), untuk menghitung selisih tinggi
-    $status : TrailStatusLog tingkat jalur yang sedang berlaku (opsional)
---}}
+
 @props(['trail', 'summit' => null, 'status' => null, 'index' => 0])
 
 @php

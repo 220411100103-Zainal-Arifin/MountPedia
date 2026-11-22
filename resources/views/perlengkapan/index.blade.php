@@ -3,10 +3,10 @@
     $priorityLabels = ['wajib' => 'Wajib', 'disarankan' => 'Disarankan', 'opsional' => 'Opsional'];
     $tripChips = ['' => 'Semua', 'tektok' => 'Tektok', 'camping' => 'Camping'];
 
-    // warna dasar kartu yang belum punya foto, bergilir menurut kategori
+    
     $tones = ['#1f5a40', '#2b4f6b', '#6b4a2b', '#4c3a6b', '#6b2b3a', '#2b6b64'];
 
-    // ikon sementara per kategori (stroke); kategori lain memakai ikon gunung
+    
     $icons = [
         'Pakaian' => '<path d="M8 4l-5 3 2 4 3-1v10h8V10l3 1 2-4-5-3a4 4 0 01-8 0z"/>',
         'Tas & Shelter' => '<path d="M3 20L12 4l9 16H3z"/><path d="M12 4v16M9 20l3-6 3 6"/>',

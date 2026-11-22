@@ -1,10 +1,4 @@
-/* ==========================================================================
-   Hero slider gunung
-   - Kartu berikutnya terangkat, membesar jadi latar penuh (Web Animations API)
-   - Judul muncul dari bawah (mask reveal), deretan kartu bergeser, penghitung berganti
-   - Autoplay dengan progress bar emas di atas
-   Tanpa dependensi.
-   ========================================================================== */
+
 (() => {
     "use strict";
 
@@ -16,7 +10,7 @@
     try {
         slides = JSON.parse(dataEl.textContent || "[]");
     } catch (e) {
-        /* data rusak */
+        
     }
     const n = slides.length;
     if (n < 1) return;
@@ -49,10 +43,7 @@
     let ready = false;
     let autoTimer = null;
 
-    /* ------------------------------------------------------------------
-     Gambar pemandangan (SVG) dibuat di browser.
-     Jika slide punya `image` asli, gambar itu yang dipakai.
-     ------------------------------------------------------------------ */
+    
     const PALETTES = {
         semeru: {
             sky: ["#1d2b4d", "#b4577f", "#ffb36b"],
@@ -275,8 +266,7 @@
         };
     }
 
-    /* Gambar disiapkan sekali di awal sebagai bitmap (JPEG). SVG yang dipakai langsung sebagai background
-     digambar ulang di setiap frame saat ukurannya berubah, itu yang membuat animasi berat. */
+    
     const IMG_W = 1280,
         IMG_H = 800;
 
@@ -329,7 +319,7 @@
         slide._img = photo || (await rasterize(slide._scene.uri));
         slide._px = photo ? 50 : slide._scene.peakPct;
         slide._py = 40;
-        // pastikan sudah ter-decode sebelum dipakai animasi
+        
         await new Promise((done) => {
             const d = new Image();
             d.onload = d.onerror = done;
@@ -342,7 +332,7 @@
         el.style.backgroundPosition = slide._px + "% " + slide._py + "%";
     }
 
-    /* latar utama berisi satu lapisan gambar (.hero__ximg), sama seperti lapisan pengembang */
+    
     function showBg(slide) {
         let xi = els.bg.firstElementChild;
         if (!xi) {
@@ -353,9 +343,7 @@
         setBg(xi, slide);
     }
 
-    /* ------------------------------------------------------------------
-     Util
-     ------------------------------------------------------------------ */
+    
     const esc = (s) =>
         String(s == null ? "" : s).replace(
             /[&<>"']/g,
@@ -393,9 +381,6 @@
             .getAnimations(subtree ? { subtree: true } : undefined)
             .forEach((a) => a.cancel());
 
-    /* ------------------------------------------------------------------
-     Render konten
-     ------------------------------------------------------------------ */
     function setContent(i) {
         const s = slides[i];
         els.place.textContent = s.place || "";
@@ -538,9 +523,6 @@
         cancelAll(el);
     }
 
-    /* ------------------------------------------------------------------
-     Autoplay
-     ------------------------------------------------------------------ */
     function stopAuto() {
         clearTimeout(autoTimer);
         autoTimer = null;
@@ -555,12 +537,6 @@
         else if (!busy && ready) startAuto();
     });
 
-    /* ------------------------------------------------------------------
-     Pindah slide
-     dir  1 = maju (kartu ke-p membesar), -1 = mundur (wipe dari kiri)
-     ------------------------------------------------------------------ */
-    /* Animasi kartu membesar memakai clip-path + transform (tanpa mengubah layout):
-     latar penuh ditampilkan di balik "jendela" yang membesar dari ukuran kartu ke layar penuh. */
     function coverFit(slide, r) {
         const s = Math.max(r.w / slide._img.w, r.h / slide._img.h);
         return {
@@ -620,7 +596,7 @@
             return;
         }
 
-        hero.classList.add("is-busy"); // matikan efek hover kartu selama animasi
+        hero.classList.add("is-busy");
         const hrect = hero.getBoundingClientRect();
         const hr = { w: hrect.width, h: hrect.height };
         const step = stepSize();
@@ -640,7 +616,6 @@
         let removeCount = 0;
 
         if (dir > 0) {
-            /* kartu terangkat lalu membesar menutup layar */
             const card = cards[p];
             const cr = card.getBoundingClientRect();
             const r = {
@@ -709,7 +684,6 @@
                 }),
             );
 
-            /* kartu baru di ujung kanan, geser deretan ke kiri */
             removeCount = p + 1;
             for (let k = 0; k <= p; k++) {
                 const nc = makeCard((old + k) % n);
@@ -741,7 +715,6 @@
                 ),
             );
         } else {
-            /* mundur: gambar menyapu dari kiri */
             ex.style.clipPath = "inset(0 100% 0 0)";
             jobs.push(
                 ex
@@ -792,7 +765,6 @@
 
         await Promise.all(jobs);
 
-        /* rapikan: lapisan pengembang (gambar sudah ter-render) dijadikan latar baru, tanpa menggambar ulang */
         current = target;
         const oldBg = els.bg;
         ex.className = "hero__bg";
@@ -822,9 +794,6 @@
         startAuto();
     }
 
-    /* ------------------------------------------------------------------
-     Event
-     ------------------------------------------------------------------ */
     els.next && els.next.addEventListener("click", () => go(1));
     els.prev && els.prev.addEventListener("click", () => go(-1));
     els.track.addEventListener("click", (e) => {
@@ -833,7 +802,7 @@
         go(1, [...els.track.children].indexOf(card));
     });
     document.addEventListener("keydown", (e) => {
-        if (document.querySelector(".nav.is-open")) return; // menu layar kecil sedang terbuka
+        if (document.querySelector(".nav.is-open")) return;
         if (e.key === "ArrowRight") go(1);
         else if (e.key === "ArrowLeft") go(-1);
     });
@@ -850,12 +819,9 @@
             go(dx < 0 ? 1 : -1);
     });
 
-    /* ------------------------------------------------------------------
-     Mulai (setelah semua gambar siap)
-     ------------------------------------------------------------------ */
     function init() {
-        const full = Math.min(4, Math.max(1, n - 2)); // jumlah kartu penuh
-        hero.style.setProperty("--cards", full + 0.4); // + sisa yang terpotong
+        const full = Math.min(4, Math.max(1, n - 2));
+        hero.style.setProperty("--cards", full + 0.4);
         hero.style.setProperty("--gaps", full);
         ready = true;
         showBg(slides[0]);

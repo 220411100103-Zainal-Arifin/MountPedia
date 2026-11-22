@@ -7,7 +7,7 @@ use App\Models\Region;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-/** @extends Factory<Mountain> */
+
 class MountainFactory extends Factory
 {
     public function definition(): array

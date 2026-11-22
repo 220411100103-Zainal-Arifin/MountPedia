@@ -26,7 +26,7 @@ class Mountain extends Model
 
     public function getRouteKeyName(): string
     {
-        return 'slug'; // URL berbasis slug (N-06, N-07)
+        return 'slug'; 
     }
 
     public function region(): BelongsTo
@@ -70,7 +70,7 @@ class Mountain extends Model
             ->withPivot(['distance_km_to_basecamp', 'note']);
     }
 
-    /** Filter ketinggian (US-02). */
+    
     public function scopeElevationBetween(Builder $query, ?int $min, ?int $max): Builder
     {
         return $query

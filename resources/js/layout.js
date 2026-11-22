@@ -1,4 +1,4 @@
-/* Perilaku navbar yang dipakai di semua halaman (menu layar kecil). */
+
 (() => {
     "use strict";
 

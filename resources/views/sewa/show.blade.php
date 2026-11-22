@@ -20,7 +20,7 @@
     <main class="shop">
         <div class="container">
 
-            {{-- 2. Galeri hero: satu foto besar + dua pendukung --}}
+            
             @if ($photos)
                 <div class="gallery gallery--{{ count($mainPhotos) }}">
                     @foreach ($mainPhotos as $i => $photo)
@@ -42,7 +42,7 @@
                 <x-sewa.empty icon="image" class="gallery-empty" title="Foto tempat sewa belum tersedia" text="Hubungi pemilik untuk melihat kondisi tempat dan perlengkapannya." />
             @endif
 
-            {{-- 3 & 4. Identitas + CTA --}}
+            
             <header class="identity">
                 <div class="identity__main">
                     <p class="identity__kicker">
@@ -88,7 +88,7 @@
                 @endif
             </header>
 
-            {{-- 5. Navigasi sticky --}}
+            
             <nav class="subnav" aria-label="Bagian halaman" data-subnav>
                 <ul>
                     @foreach ($nav as $id => $label)
@@ -100,7 +100,7 @@
             <div class="shop__layout">
                 <div class="shop__main">
 
-                    {{-- 6. Tentang: tata letak editorial --}}
+                    
                     <x-sewa.section id="tentang" eyebrow="Tentang" title="Tentang tempat sewa ini">
                         <div class="about">
                             <div class="about__text">
@@ -133,7 +133,7 @@
                         </div>
                     </x-sewa.section>
 
-                    {{-- 7 & 8. Katalog: grid standar + filter + pencarian --}}
+                    
                     <x-sewa.section id="katalog" eyebrow="Katalog" title="Perlengkapan yang disewakan">
                         @if ($items)
                             <div class="toolbar">
@@ -175,7 +175,7 @@
                         @endif
                     </x-sewa.section>
 
-                    {{-- 9 & 10. Harga, ketentuan, ketersediaan --}}
+                    
                     <x-sewa.section id="harga" eyebrow="Harga" title="Harga sewa & ketentuan">
                         <div class="pricing">
                             <div class="pricing__table">
@@ -221,7 +221,7 @@
                         </div>
                     </x-sewa.section>
 
-                    {{-- 11. Peta (Leaflet) --}}
+                    
                     <x-sewa.section id="lokasi" eyebrow="Lokasi" title="Peta & alamat">
                         <div class="where">
                             @if ($hasCoords)
@@ -253,7 +253,7 @@
                         </div>
                     </x-sewa.section>
 
-                    {{-- 13. Ulasan --}}
+                    
                     <x-sewa.section id="ulasan" eyebrow="Ulasan" title="Ulasan pengunjung">
                         @if ($hasRating)
                             <div class="reviews">
@@ -295,7 +295,7 @@
                     </x-sewa.section>
                 </div>
 
-                {{-- Sidebar sticky: kontak, jam, lokasi --}}
+                
                 <aside class="aside" aria-label="Kontak dan informasi">
                     <div class="aside__panel">
                         <section class="aside__block">
@@ -367,7 +367,7 @@
             </div>
         </div>
 
-        {{-- Bilah CTA untuk layar kecil --}}
+        
         @if ($waGeneral || $directionsUrl)
             <div class="ctabar">
                 @if ($waGeneral)

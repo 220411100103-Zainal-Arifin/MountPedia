@@ -1,9 +1,7 @@
 @import "tailwindcss";
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views*.blade.php';
+@source '..*.js';
 
 @theme {
     --font-display:
@@ -29,7 +27,7 @@
     --color-gold: #f4b43a;
 }
 
-/* ---------- Leaflet (di luar @layer agar menang atas CSS bawaan Leaflet) ---------- */
+
 .leaflet-container {
     font-family: var(--font-sans);
     background: #dfe9e2;

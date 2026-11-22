@@ -1,9 +1,9 @@
 @props([
     'title' => null,
     'description' => 'Cari gunung, jalur pendakian, status buka/tutup, tarif simaksi, prakiraan cuaca, dan persewaan perlengkapan.',
-    'overlay' => false,   // navbar transparan di atas hero
+    'overlay' => false,   
     'footer' => true,
-    'assets' => [],       // CSS/JS khusus halaman
+    'assets' => [],       
 ])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">

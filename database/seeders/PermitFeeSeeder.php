@@ -7,10 +7,7 @@ use App\Models\PermitFee;
 use App\Models\TripType;
 use Illuminate\Database\Seeder;
 
-/**
- * Tarif di bawah ini adalah PLACEHOLDER untuk pengembangan, bukan tarif resmi.
- * Ganti dengan tarif dari pengelola kawasan dan isi source_url.
- */
+
 class PermitFeeSeeder extends Seeder
 {
     public function run(): void
@@ -18,7 +15,7 @@ class PermitFeeSeeder extends Seeder
         $tektok = TripType::where('code', 'tektok')->firstOrFail();
         $camping = TripType::where('code', 'camping')->firstOrFail();
 
-        // [trip type, satuan, weekday WNI, weekend/libur WNI]
+        
         $plans = [
             [$tektok, 'per_orang', 20000, 25000],
             [$camping, 'per_orang_per_malam', 25000, 30000],

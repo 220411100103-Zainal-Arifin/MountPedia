@@ -6,7 +6,7 @@ use App\Models\Campsite;
 use App\Models\Mountain;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<Campsite> */
+
 class CampsiteFactory extends Factory
 {
     public function definition(): array

@@ -23,13 +23,13 @@ class GearItem extends Model
 
     protected static function booted(): void
     {
-        // slug otomatis dari nama bila belum diisi (seeder/factory/form)
+        
         static::saving(function (self $item) {
             $item->slug ??= Str::slug($item->name);
         });
     }
 
-    // /perlengkapan/{gearItem} akan mencari berdasarkan slug
+    
     public function getRouteKeyName(): string
     {
         return 'slug';

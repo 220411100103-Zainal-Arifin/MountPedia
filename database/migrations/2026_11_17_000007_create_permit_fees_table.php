@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignId('trip_type_id')->constrained('trip_types');
             $table->enum('visitor_type', ['wni', 'wna'])->default('wni');
             $table->enum('day_type', ['weekday', 'weekend_libur'])->default('weekday');
-            $table->unsignedInteger('fee_idr'); // rupiah bulat, bukan desimal
+            $table->unsignedInteger('fee_idr'); 
             $table->enum('fee_unit', ['per_orang', 'per_orang_per_malam'])->default('per_orang');
             $table->date('valid_from')->nullable();
             $table->date('valid_until')->nullable();

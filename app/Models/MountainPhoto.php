@@ -16,7 +16,7 @@ class MountainPhoto extends Model
         return $this->belongsTo(Mountain::class);
     }
 
-    /** URL siap pakai: path yang diawali http(s) dipakai apa adanya, selainnya lewat disk "public". */
+    
     protected function src(): Attribute
     {
         return Attribute::get(fn () => preg_match('#^(https?:)?//#', $this->path)

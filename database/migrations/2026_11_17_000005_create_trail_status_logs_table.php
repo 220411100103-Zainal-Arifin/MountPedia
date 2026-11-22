@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('trail_status_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('mountain_id')->constrained('mountains')->cascadeOnDelete();
-            // NULL = status tingkat gunung; terisi = status tingkat jalur
+            
             $table->foreignId('trail_id')->nullable()->constrained('trails')->cascadeOnDelete();
             $table->enum('status', ['buka', 'tutup', 'dibatasi']);
             $table->string('reason')->nullable();

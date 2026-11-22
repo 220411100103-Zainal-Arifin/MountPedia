@@ -3,7 +3,7 @@
     $elev = number_format($mountain->elevation_mdpl, 0, ',', '.');
     $hasPhotos = $mountain->photos->isNotEmpty();
 
-    // tanggal dan jam dalam bahasa Indonesia (null aman)
+    
     $dateId = fn ($d, $fmt = 'j F Y') => $d?->locale('id')->translatedFormat($fmt);
     $rupiah = fn ($v) => $v === null ? '—' : 'Rp '.number_format($v, 0, ',', '.');
     $dms = fn ($v) => number_format((float) $v, 4, ',', '.').'°';
@@ -26,7 +26,7 @@
         ['Koordinat puncak', $coords],
     ], fn ($f) => filled($f[1]));
 
-    // navigasi section: hanya section yang benar-benar punya isi
+    
     $sections = array_values(array_filter([
         ['ringkasan', 'Ringkasan', true],
         ['jalur', 'Jalur', true],
@@ -49,9 +49,7 @@
         <script type="application/ld+json">{!! json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
     </x-slot:head>
 
-    {{-- ================================================================
-         1. HERO panorama
-         ================================================================ --}}
+    
     <header class="relative isolate flex h-[80svh] min-h-[34rem] items-end overflow-hidden bg-pine-950 text-white lg:h-[88svh]">
         @if ($heroPhoto)
             <img src="{{ $heroPhoto }}" alt="Panorama {{ $mountain->name }}" fetchpriority="high" class="absolute inset-0 -z-20 size-full object-cover">
@@ -89,9 +87,7 @@
     </header>
 
     <div class="bg-paper text-ink">
-        {{-- ================================================================
-             2. INFORMASI CEPAT: bento grid (menumpuk di tepi bawah hero)
-             ================================================================ --}}
+        
         <div class="container relative z-10 -mt-28 lg:-mt-32">
             <div class="grid grid-cols-2 gap-3 rounded-[2rem] bg-paper p-3 shadow-[0_40px_80px_-40px_rgba(8,26,19,0.5)] lg:grid-cols-6 lg:grid-rows-2">
                 <x-mountain.bento-tile label="Ketinggian puncak" tone="forest" class="col-span-2 lg:row-span-2">
@@ -145,9 +141,7 @@
             </div>
         </div>
 
-        {{-- ================================================================
-             3. NAVIGASI SECTION (menempel di atas saat di-scroll)
-             ================================================================ --}}
+        
         <div data-nav-sentinel class="mt-10 h-px"></div>
         <div data-section-nav data-stuck="false" class="group sticky top-0 z-30 border-b border-line bg-paper/85 backdrop-blur-xl">
             <div class="container flex items-center gap-6">
@@ -164,13 +158,10 @@
             </div>
         </div>
 
-        {{-- ================================================================
-             KONTEN: kolom utama + sidebar menempel
-             Di layar kecil sidebar tampil lebih dulu (status & tarif adalah yang paling dicari).
-             ================================================================ --}}
+        
         <div class="container grid gap-14 py-14 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-16 lg:py-20 xl:grid-cols-[minmax(0,1fr)_23rem]">
 
-            {{-- ============ 7. SIDEBAR informasi penting ============ --}}
+            
             <aside aria-label="Informasi penting" class="lg:order-2">
                 <div class="lg:sticky lg:top-[4.75rem] lg:max-h-[calc(100svh-6rem)] lg:overflow-y-auto lg:overscroll-contain lg:[scrollbar-width:thin]">
                     <div class="divide-y divide-line rounded-[2rem] border border-line bg-white p-6 sm:p-7">
@@ -296,10 +287,10 @@
                 </div>
             </aside>
 
-            {{-- ============ Kolom utama ============ --}}
+            
             <div class="min-w-0 space-y-24 lg:order-1 lg:space-y-32">
 
-                {{-- 4. RINGKASAN: tata letak editorial dua kolom --}}
+                
                 <x-mountain.section id="ringkasan" eyebrow="Ringkasan" :title="'Mengenal '.$mountain->name">
                     <div class="grid gap-10 md:grid-cols-[12rem_minmax(0,1fr)] md:gap-14">
                         @if (count($facts))
@@ -326,7 +317,7 @@
                     </div>
                 </x-mountain.section>
 
-                {{-- 5. JALUR: kartu informasi horizontal --}}
+                
                 <x-mountain.section id="jalur" eyebrow="Jalur pendakian" title="Pilih jalurmu">
                     @if ($mountain->trails->isEmpty())
                         <p class="rounded-2xl bg-pine-100 p-6 text-sm leading-6 text-pine-900">Belum ada data jalur untuk gunung ini.</p>
@@ -368,7 +359,7 @@
                     @endif
                 </x-mountain.section>
 
-                {{-- 6. PETA interaktif (Leaflet) --}}
+                
                 @if (count($mapPoints))
                     <x-mountain.section id="peta" eyebrow="Peta" title="Titik penting di lapangan">
                         <p class="mb-8 max-w-[60ch] text-[15px] leading-7 text-ink-soft">
@@ -417,7 +408,7 @@
                     </x-mountain.section>
                 @endif
 
-                {{-- 8. GALERI: masonry (hanya tampil bila sudah ada foto) --}}
+                
                 @if ($hasPhotos)
                     <x-mountain.section id="galeri" eyebrow="Galeri" title="Dari lapangan">
                         <ul class="columns-2 gap-3 sm:columns-3 [&>li]:mb-3">
@@ -466,9 +457,7 @@
             </div>
         </div>
 
-        {{-- ================================================================
-             9. REKOMENDASI: kartu yang bisa digeser horizontal
-             ================================================================ --}}
+        
         @if ($related->isNotEmpty())
             <section id="serupa" data-spy-section data-carousel aria-labelledby="serupa-title" class="scroll-mt-24 border-t border-line bg-white py-16 lg:py-24">
                 <div class="container flex flex-wrap items-end justify-between gap-6">

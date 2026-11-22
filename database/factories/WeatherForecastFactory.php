@@ -6,7 +6,7 @@ use App\Models\Mountain;
 use App\Models\WeatherForecast;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<WeatherForecast> */
+
 class WeatherForecastFactory extends Factory
 {
     public function definition(): array

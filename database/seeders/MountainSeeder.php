@@ -8,11 +8,7 @@ use App\Models\Region;
 use App\Models\Trail;
 use Illuminate\Database\Seeder;
 
-/**
- * Data awal gunung, jalur, dan camp.
- * Angka (jarak, durasi, ketinggian camp, kapasitas) adalah PERKIRAAN untuk kebutuhan
- * pengembangan dan wajib diverifikasi ke pengelola sebelum publikasi.
- */
+
 class MountainSeeder extends Seeder
 {
     public function run(): void
@@ -41,7 +37,7 @@ class MountainSeeder extends Seeder
                     [
                         'name' => $t['name'],
                         'basecamp_name' => $t['basecamp'],
-                        // koordinat contoh: digeser dari titik gunung, BUKAN koordinat basecamp sebenarnya
+                        
                         'basecamp_latitude' => round($row['lat'] - 0.04 * ($i + 1), 6),
                         'basecamp_longitude' => round($row['lng'] + 0.03 * ($i + 1), 6),
                         'start_elevation_mdpl' => $t['start'],
@@ -68,7 +64,7 @@ class MountainSeeder extends Seeder
                         'capacity_tents' => $c['tents'],
                         'has_water_source' => $c['water'],
                         'water_note' => $c['water_note'],
-                        // koordinat contoh, bukan koordinat camp sebenarnya
+                        
                         'latitude' => round($row['lat'] - 0.01 * ($j + 1), 6),
                         'longitude' => round($row['lng'] + 0.01 * ($j + 1), 6),
                         'notes' => $c['notes'] ?? sprintf('Area camp di ketinggian %s mdpl (data contoh).', $c['elevation']),
@@ -193,8 +189,8 @@ class MountainSeeder extends Seeder
                     ['name' => 'Danau Segara Anak', 'elevation' => 2000, 'tents' => 100, 'water' => true, 'water_note' => 'Air danau, perlu dimasak/disaring'],
                 ],
             ],
-            // ---- Tempel blok ini di dalam array return pada MountainSeeder::data(),
-            // ---- tepat setelah entri 'Gunung Rinjani' dan sebelum penutup `];`
+            
+            
             [
                 'name' => 'Gunung Kawi', 'slug' => 'kawi', 'elevation' => 2651,
                 'region' => ['Jawa Timur', 'Kabupaten Malang'],

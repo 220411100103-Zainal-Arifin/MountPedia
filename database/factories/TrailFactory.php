@@ -7,7 +7,7 @@ use App\Models\Trail;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-/** @extends Factory<Trail> */
+
 class TrailFactory extends Factory
 {
     public function definition(): array

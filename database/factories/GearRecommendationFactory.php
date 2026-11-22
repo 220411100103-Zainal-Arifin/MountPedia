@@ -7,7 +7,7 @@ use App\Models\GearRecommendation;
 use App\Models\TripType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<GearRecommendation> */
+
 class GearRecommendationFactory extends Factory
 {
     public function definition(): array

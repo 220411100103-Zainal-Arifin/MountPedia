@@ -7,7 +7,7 @@ use App\Models\RentalShop;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-/** @extends Factory<RentalShop> */
+
 class RentalShopFactory extends Factory
 {
     public function definition(): array

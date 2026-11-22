@@ -1,7 +1,7 @@
 @props(['overlay' => false])
 
 @php
-    // [label, url, pola untuk penanda halaman aktif]
+    
     $links = [
         ['Beranda', url('/'), '/'],
         ['Gunung', url('/gunung'), 'gunung*'],

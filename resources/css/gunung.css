@@ -1,7 +1,4 @@
-/* ==========================================================================
-   Halaman Daftar Gunung (Mountain Explorer)
-   Variabel & reset bersama ada di layout.css
-   ========================================================================== */
+
 .explorer {
     --green-900: #0f2e21;
     --green-800: #17432f;
@@ -31,7 +28,7 @@
     border: 0;
 }
 
-/* ---------- Header ---------- */
+
 .explorer__head {
     margin-bottom: clamp(36px, 5vw, 64px);
 }
@@ -72,7 +69,7 @@
     color: var(--ink-soft);
 }
 
-/* ---------- Pencarian & filter ---------- */
+
 .explorer__filters form {
     display: grid;
     gap: 14px;
@@ -220,7 +217,7 @@
     outline-offset: 2px;
 }
 
-/* titik status (dipakai chip dan badge kartu) */
+
 .dot {
     display: inline-block;
     flex: none;
@@ -242,7 +239,7 @@
     background: var(--gold);
 }
 
-/* ---------- Bar hasil ---------- */
+
 .explorer__bar {
     display: flex;
     flex-wrap: wrap;
@@ -267,7 +264,7 @@
     color: var(--green-900);
 }
 
-/* ---------- Masonry ---------- */
+
 .masonry {
     column-count: 3;
     column-gap: var(--gutter);
@@ -394,7 +391,7 @@
     }
 }
 
-/* ---------- Pagination ---------- */
+
 .pager {
     display: flex;
     align-items: center;
@@ -458,7 +455,7 @@ a.pager__step:hover {
     outline-offset: 2px;
 }
 
-/* ---------- Kosong ---------- */
+
 .empty {
     padding: clamp(48px, 8vw, 96px) 0;
     text-align: center;
@@ -487,7 +484,7 @@ a.pager__step:hover {
     border-radius: 999px;
 }
 
-/* ---------- Responsif ---------- */
+
 @media (min-width: 981px) {
     .chips {
         margin-left: auto;
@@ -527,11 +524,9 @@ a.pager__step:hover {
     }
 }
 
-/* ==========================================================================
-   Latar foto gunung yang memudar ke warna solid + footer disembunyikan
-   ========================================================================== */
+
 .explorer {
-    --bg-solid: #0f2e21; /* diganti gunung.js sesuai warna dasar foto */
+    --bg-solid: #0f2e21; 
     position: relative;
     overflow: clip;
     color: #eef3ec;
@@ -600,23 +595,18 @@ a.pager__step:hover {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
 }
 
-/* cadangan: sembunyikan footer layout bila belum memakai prop :footer */
+
 body:has(.explorer) .site-footer {
     display: none;
 }
 
-/* ==========================================================================
-   Navbar transparan: memakai <x-site-nav :overlay="true"> (kelas .nav--overlay)
-   ========================================================================== */
-/* ruang untuk navbar yang melayang di atas halaman */
+
+
 .explorer {
     padding-top: clamp(150px, 15vw, 200px);
 }
 
-/* ==========================================================================
-   Masonry rata bawah: kolom disusun gunung.js, tiap kolom diregangkan
-   sampai tingginya sama sehingga tidak ada ruang kosong di bawah
-   ========================================================================== */
+
 .masonry--js {
     display: flex;
     align-items: stretch;

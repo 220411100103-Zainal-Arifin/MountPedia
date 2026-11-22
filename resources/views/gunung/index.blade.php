@@ -1,5 +1,5 @@
 @php
-    // Rasio foto bervariasi; dipilih stabil dari slug dan tidak pernah sama dengan kartu sebelumnya
+    
     $ratios = ['4 / 5', '3 / 4', '1 / 1', '4 / 3'];
     $statusLabels = ['buka' => 'Dibuka', 'tutup' => 'Ditutup', 'dibatasi' => 'Dibatasi'];
     $statusChips = ['' => 'Semua', 'buka' => 'Dibuka', 'dibatasi' => 'Dibatasi', 'tutup' => 'Ditutup'];
@@ -106,7 +106,7 @@
                             $prev = $pick;
 
                             $place = Str::replaceFirst('Kabupaten ', '', $m->region->regency).', '.$m->region->province;
-                            // image_url dari seeder hanya placeholder; abaikan agar kartu memakai ilustrasi bawaan
+                            
                             $photo = str_contains((string) $m->image_url, 'placehold.co') ? null : $m->image_url;
                         @endphp
                         <li class="mx-item" style="--i: {{ $loop->index }}">

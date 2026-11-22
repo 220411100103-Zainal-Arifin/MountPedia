@@ -1,6 +1,4 @@
-/* Halaman Daftar Gunung
-   - Latar kartu: foto asli (data-image) atau ilustrasi SVG dari scene.js
-   - Dropdown dan chip status langsung memicu pencarian; kolom kosong tidak ikut ke URL */
+
 import { sceneFor } from "./scene.js";
 
 (() => {
@@ -22,8 +20,6 @@ import { sceneFor } from "./scene.js";
         media.style.backgroundPosition = scene.peakPct + "% 40%";
     });
 
-    // Masonry rata bawah: kolom disusun di sini, rasio dipilih agar tinggi antarkolom
-    // hampir sama, sisanya diregangkan CSS sehingga dasar semua kolom sejajar
     const grid = document.querySelector(".masonry");
     if (grid) {
         const RATIOS = [
@@ -48,7 +44,6 @@ import { sceneFor } from "./scene.js";
                   ? 2
                   : 3;
 
-        // taruh tiap kartu ke kolom terpendek, lalu nilai seberapa rata hasilnya
         const place = (idx, cols, colW, gap) => {
             const tot = Array(cols).fill(0);
             const cnt = Array(cols).fill(0);
@@ -63,13 +58,13 @@ import { sceneFor } from "./scene.js";
             let score = Math.max(...h) - Math.min(...h);
             const last = Array(cols).fill(-1);
             idx.forEach((k, i) => {
-                if (last[at[i]] === k) score += 40; // hindari rasio sama bertumpuk
+                if (last[at[i]] === k) score += 40;
                 last[at[i]] = k;
             });
             const limit = Math.ceil(idx.length / 3) + 1;
             RATIOS.forEach((_, k) => {
                 const used = idx.filter((v) => v === k).length;
-                if (used > limit) score += 30 * (used - limit); // jaga variasi
+                if (used > limit) score += 30 * (used - limit);
             });
             return { at, score };
         };
@@ -138,7 +133,6 @@ import { sceneFor } from "./scene.js";
         });
     }
 
-    // Latar halaman: foto (atau ilustrasi) dari gunung pertama, memudar ke warna solid
     const root = document.querySelector(".explorer");
     const backdrop = document.querySelector(".explorer__backdrop");
     if (root && backdrop) {
@@ -150,7 +144,7 @@ import { sceneFor } from "./scene.js";
             backdrop.style.backgroundImage =
                 'url("' + photo.replace(/"/g, "%22") + '")';
             backdrop.style.backgroundPosition = "50% 100%";
-            // ambil warna rata-rata baris bawah foto agar gradasinya menyatu
+            
             const img = new Image();
             img.crossOrigin = "anonymous";
             img.onload = () => {
@@ -177,7 +171,7 @@ import { sceneFor } from "./scene.js";
                             ")",
                     );
                 } catch (e) {
-                    /* foto lintas domain tanpa CORS: tetap pakai warna bawaan */
+                    
                 }
             };
             img.src = photo;
@@ -198,14 +192,14 @@ import { sceneFor } from "./scene.js";
         el.addEventListener("change", submit),
     );
 
-    // URL tetap bersih: jangan kirim kolom yang kosong / "Semua"
+    
     form.addEventListener("submit", () => {
         form.querySelectorAll("input[name], select[name]").forEach((el) => {
             const isRadio = el.type === "radio";
             if (el.value === "" && (!isRadio || el.checked)) el.disabled = true;
         });
     });
-    // tombol Kembali (bfcache) bisa memulihkan halaman dengan kolom yang masih nonaktif
+    
     window.addEventListener("pageshow", () =>
         form
             .querySelectorAll("[disabled]")

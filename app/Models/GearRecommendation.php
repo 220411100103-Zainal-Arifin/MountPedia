@@ -30,17 +30,14 @@ class GearRecommendation extends Model
         return $this->belongsTo(Mountain::class);
     }
 
-    /**
-     * Aturan yang berlaku untuk durasi $nights malam (tektok = 0):
-     * min_nights <= N dan (max_nights kosong atau >= N).
-     */
+    
     public function scopeForNights(Builder $query, int $nights): Builder
     {
         return $query->where('min_nights', '<=', $nights)
             ->where(fn ($q) => $q->whereNull('max_nights')->orWhere('max_nights', '>=', $nights));
     }
 
-    /** Aturan umum + kekhususan gunung terkait. */
+    
     public function scopeForMountain(Builder $query, ?int $mountainId): Builder
     {
         return $query->where(fn ($q) => $q->whereNull('mountain_id')

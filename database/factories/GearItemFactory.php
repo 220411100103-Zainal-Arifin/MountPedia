@@ -7,7 +7,7 @@ use App\Models\GearItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-/** @extends Factory<GearItem> */
+
 class GearItemFactory extends Factory
 {
     public function definition(): array
@@ -20,11 +20,11 @@ class GearItemFactory extends Factory
             'slug' => Str::slug($name),
             'description' => fake()->sentence(),
             'is_rentable' => true,
-            'image_url' => null, // kosong = kartu tampil dengan warna kategori + ikon
+            'image_url' => null, 
         ];
     }
 
-    /** Perlengkapan dengan gambar, mis. GearItem::factory()->withImage()->create() */
+    
     public function withImage(?string $path = null): static
     {
         return $this->state(fn (array $attributes) => [
@@ -32,7 +32,7 @@ class GearItemFactory extends Factory
         ]);
     }
 
-    /** Perlengkapan yang tidak disewakan */
+    
     public function notRentable(): static
     {
         return $this->state(['is_rentable' => false]);

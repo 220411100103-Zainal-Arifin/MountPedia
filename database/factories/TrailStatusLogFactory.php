@@ -6,7 +6,7 @@ use App\Models\Mountain;
 use App\Models\TrailStatusLog;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<TrailStatusLog> */
+
 class TrailStatusLogFactory extends Factory
 {
     public function definition(): array

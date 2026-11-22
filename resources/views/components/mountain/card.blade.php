@@ -1,7 +1,4 @@
-{{--
-    Kartu gunung portrait (dipakai carousel rekomendasi; bisa dipakai ulang di halaman lain).
-    $mountain : model Mountain dengan relasi region; kolom current_status opsional (scope withCurrentStatus)
---}}
+
 @props(['mountain'])
 
 @php

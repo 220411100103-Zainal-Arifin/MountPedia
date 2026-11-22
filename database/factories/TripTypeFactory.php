@@ -5,7 +5,7 @@ namespace Database\Factories;
 use App\Models\TripType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<TripType> */
+
 class TripTypeFactory extends Factory
 {
     public function definition(): array

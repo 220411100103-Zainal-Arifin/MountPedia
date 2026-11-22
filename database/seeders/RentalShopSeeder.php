@@ -9,14 +9,10 @@ use App\Models\RentalItem;
 use App\Models\RentalShop;
 use Illuminate\Database\Seeder;
 
-/**
- * Toko persewaan CONTOH (nama acak dari factory, belum terverifikasi; nomor telepon berpola 0812-0000-xxxx
- * sengaja dibuat palsu, koordinat acak di sekitar pusat wilayah).
- * Ganti dengan hasil survei dan set is_verified = true setelah dikonfirmasi.
- */
+
 class RentalShopSeeder extends Seeder
 {
-    /** [provinsi, kabupaten/kota] => slug gunung yang dilayani */
+    
     private array $coverage = [
         'Kota Batu' => ['panderman', 'arjuno'],
         'Kota Malang' => ['semeru', 'arjuno', 'panderman'],
@@ -28,7 +24,7 @@ class RentalShopSeeder extends Seeder
         'Kabupaten Lombok Timur' => ['rinjani'],
     ];
 
-    /** Titik tengah perkiraan tiap wilayah untuk koordinat toko contoh. */
+    
     private array $center = [
         'Kota Batu' => [-7.8672, 112.5239],
         'Kota Malang' => [-7.9666, 112.6326],
@@ -40,7 +36,7 @@ class RentalShopSeeder extends Seeder
         'Kabupaten Lombok Timur' => [-8.5389, 116.5000],
     ];
 
-    /** Harga dasar contoh per hari (rupiah). */
+    
     private array $basePrice = [
         'Tenda dome' => 40000, 'Sleeping bag' => 15000, 'Matras' => 5000, 'Hammock' => 10000,
         'Carrier 40-60 L' => 20000, 'Daypack 20-30 L' => 10000, 'Rain cover tas' => 5000,
@@ -54,7 +50,7 @@ class RentalShopSeeder extends Seeder
     public function run(): void
     {
         if (RentalShop::exists()) {
-            return; // hindari duplikasi slug saat seeder dijalankan ulang
+            return; 
         }
 
         $rentable = GearItem::where('is_rentable', true)->get();
@@ -91,7 +87,7 @@ class RentalShopSeeder extends Seeder
                             'rental_shop_id' => $shop->id,
                             'gear_item_id' => $gear->id,
                             'item_name' => $gear->name,
-                            // variasi ±20%, dibulatkan ke Rp1.000
+                            
                             'price_per_day_idr' => (int) (round($base * fake()->randomFloat(2, 0.8, 1.2) / 1000) * 1000),
                             'stock_note' => fake()->randomElement(['Tersedia', 'Stok terbatas']),
                             'notes' => 'Harga belum termasuk deposit (data contoh)',

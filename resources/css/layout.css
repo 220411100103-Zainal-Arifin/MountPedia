@@ -1,6 +1,4 @@
-/* ==========================================================================
-   Layout bersama: variabel, reset, navbar, footer
-   ========================================================================== */
+
 :root {
     --gold: #f4b43a;
     --display:
@@ -10,7 +8,7 @@
     --pad-x: clamp(16px, 3vw, 48px);
 }
 
-/* Di dalam @layer base supaya tidak mengalahkan utilitas Tailwind (text-*, bg-*, dst.) */
+
 @layer base {
     *,
     *::before,
@@ -34,14 +32,14 @@
     }
 }
 
-/* max-width: none menimpa .container bawaan Tailwind (yang membatasi 640/768/1024px) */
+
 .container {
     width: min(1200px, 100% - 2 * var(--pad-x));
     max-width: none;
     margin-inline: auto;
 }
 
-/* ---------- Navbar ---------- */
+
 .nav {
     position: relative;
     z-index: 20;
@@ -52,7 +50,7 @@
     background: #0a0f15;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-/* varian transparan di atas hero */
+
 .nav--overlay {
     position: absolute;
     top: 0;
@@ -79,7 +77,7 @@
 .nav__word-b {
     color: var(--gold);
 }
-/* menu di seberang logo (kanan), bukan di tengah */
+
 .nav__menu {
     margin-left: auto;
 }
@@ -134,7 +132,7 @@
     height: 18px;
 }
 
-/* tombol hamburger (hanya di layar kecil) */
+
 .nav__toggle {
     display: none;
     position: relative;
@@ -247,7 +245,7 @@
     }
 }
 
-/* ---------- Footer ---------- */
+
 .site-footer {
     padding: 36px var(--pad-x);
     border-top: 1px solid rgba(255, 255, 255, 0.08);

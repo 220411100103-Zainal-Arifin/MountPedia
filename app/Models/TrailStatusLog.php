@@ -32,7 +32,7 @@ class TrailStatusLog extends Model
         return $this->belongsTo(Trail::class);
     }
 
-    /** Periodenya mencakup hari ini: starts_on <= hari ini dan (ends_on kosong atau >= hari ini). */
+    
     public function scopeActiveToday(Builder $query): Builder
     {
         $today = now()->toDateString();
@@ -41,7 +41,7 @@ class TrailStatusLog extends Model
             ->where(fn ($q) => $q->whereNull('ends_on')->orWhereDate('ends_on', '>=', $today));
     }
 
-    /** Status tingkat gunung (trail_id kosong). */
+    
     public function scopeMountainLevel(Builder $query): Builder
     {
         return $query->whereNull('trail_id');

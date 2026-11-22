@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('trip_type_id')->constrained('trip_types');
             $table->foreignId('gear_item_id')->constrained('gear_items')->cascadeOnDelete();
-            // NULL = aturan umum; terisi = kekhususan gunung tertentu
+            
             $table->foreignId('mountain_id')->nullable()->constrained('mountains')->cascadeOnDelete();
             $table->unsignedTinyInteger('min_nights')->default(0);
             $table->unsignedTinyInteger('max_nights')->nullable();

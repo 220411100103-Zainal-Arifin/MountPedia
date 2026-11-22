@@ -17,7 +17,7 @@ class GearSeeder extends Seeder
         $this->seedRecommendations();
     }
 
-    /** kategori => [[nama item, rentable, deskripsi], ...] */
+    
     private function catalog(): array
     {
         return [
@@ -99,7 +99,7 @@ class GearSeeder extends Seeder
         $tektok = TripType::where('code', 'tektok')->firstOrFail();
         $camping = TripType::where('code', 'camping')->firstOrFail();
 
-        // Tektok: min_nights = 0
+        
         $tektokRules = [
             ['Daypack 20-30 L', 'wajib'], ['Botol minum 1,5 L', 'wajib'], ['Jaket gunung', 'wajib'],
             ['Jas hujan / ponco', 'wajib'], ['Sepatu gunung / trail', 'wajib'], ['Headlamp', 'wajib'],
@@ -112,7 +112,7 @@ class GearSeeder extends Seeder
             $this->rule($tektok, $item, 0, null, $priority);
         }
 
-        // Camping, berlaku untuk semua durasi >= 1 malam
+        
         $campingAll = [
             ['Carrier 40-60 L', 'wajib'], ['Tenda dome', 'wajib'], ['Sleeping bag', 'wajib'], ['Matras', 'wajib'],
             ['Jaket gunung', 'wajib'], ['Jas hujan / ponco', 'wajib'], ['Sepatu gunung / trail', 'wajib'],
@@ -129,7 +129,7 @@ class GearSeeder extends Seeder
             $this->rule($camping, $item, 1, null, $priority);
         }
 
-        // Kebutuhan yang bertambah menurut durasi malam
+        
         $byNights = [
             ['Logistik makanan', 'wajib', [[1, 1, '3 kali makan + snack'], [2, 2, '5 kali makan + snack'], [3, null, '8 kali makan + snack, tambah cadangan 1 hari']]],
             ['Gas kaleng', 'wajib', [[1, 2, '1 kaleng per 4 orang'], [3, null, '2 kaleng per 4 orang']]],
@@ -142,7 +142,7 @@ class GearSeeder extends Seeder
             }
         }
 
-        // Kekhususan gunung (menambah/menimpa aturan umum)
+        
         $this->mountainRule('semeru', $tektok, 'Buff / masker', 0, null, 'wajib', 'Debu dan gas vulkanik di jalur Kalimati-Mahameru');
         $this->mountainRule('semeru', $camping, 'Buff / masker', 1, null, 'wajib', 'Debu dan gas vulkanik di jalur Kalimati-Mahameru');
         $this->mountainRule('rinjani', $camping, 'Trekking pole', 1, null, 'disarankan', 'Tanjakan panjang dan medan pasir');
@@ -150,7 +150,7 @@ class GearSeeder extends Seeder
         $this->mountainRule('lawu', $camping, 'Jaket gunung', 1, null, 'wajib', 'Suhu malam dingin dan berangin');
     }
 
-    /** Petunjuk jumlah dan catatan bawaan per item (dipakai bila aturan tidak menyebutkannya). */
+    
     private function hint(string $item): array
     {
         $hints = [

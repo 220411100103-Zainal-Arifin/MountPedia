@@ -13,7 +13,7 @@ class MountainController extends Controller
 {
     private const PER_PAGE = 12;
 
-    /** kunci query (?mdpl=) => [min, max, label] */
+    
     private const ELEVATION_RANGES = [
         '0-1499' => [0, 1499, 'Di bawah 1.500 mdpl'],
         '1500-2499' => [1500, 2499, '1.500 – 2.499 mdpl'],
@@ -30,7 +30,7 @@ class MountainController extends Controller
         $range = $request->query('mdpl');
         $status = $request->query('status');
 
-        // Nilai yang tidak valid diabaikan, bukan menyebabkan error
+        
         $filters = [
             'q' => is_string($q) ? mb_substr(trim($q), 0, 80) : '',
             'provinsi' => is_string($province) ? $province : '',
@@ -38,8 +38,8 @@ class MountainController extends Controller
             'status' => is_string($status) && in_array($status, self::STATUSES, true) ? $status : '',
         ];
 
-        // Status terkini tingkat gunung (periode mencakup hari ini, laporan terbaru).
-        // Dipakai dua kali: sebagai kolom `current_status` dan sebagai syarat filter.
+        
+        
         $currentStatus = fn () => TrailStatusLog::query()
             ->select('status')
             ->whereColumn((new TrailStatusLog)->qualifyColumn('mountain_id'), (new Mountain)->qualifyColumn('id'))
@@ -69,7 +69,7 @@ class MountainController extends Controller
             ->paginate(self::PER_PAGE)
             ->withQueryString();
 
-        // ?page= melebihi halaman terakhir: arahkan ke halaman terakhir
+        
         if ($mountains->currentPage() > $mountains->lastPage()) {
             return redirect()->to($mountains->url($mountains->lastPage()));
         }
@@ -99,7 +99,7 @@ class MountainController extends Controller
             'photos',
         ]);
 
-        // Status terkini: tingkat gunung, dan tingkat jalur (menimpa status gunung untuk jalur itu)
+        
         $status = $mountain->statusLogs()->mountainLevel()->activeToday()
             ->orderByDesc('reported_at')->first();
 
@@ -107,13 +107,13 @@ class MountainController extends Controller
             ->orderByDesc('reported_at')->get()
             ->unique('trail_id')->keyBy('trail_id');
 
-        // Prakiraan terdekat per titik (basecamp / puncak)
+        
         $weather = $mountain->weatherForecasts()
             ->where('forecast_at', '>=', now()->subHours(3))
             ->orderBy('forecast_at')->get()
             ->groupBy('point')->map(fn (Collection $g) => $g->first());
 
-        // Rekomendasi: provinsi yang sama lebih dulu, lalu ketinggian yang paling berdekatan
+        
         $related = Mountain::query()
             ->with('region')
             ->withCurrentStatus()
@@ -139,13 +139,13 @@ class MountainController extends Controller
         ]);
     }
 
-    /** image_url dari seeder hanya placeholder; abaikan agar halaman memakai ilustrasi bawaan. */
+    
     private function realImage(?string $url): ?string
     {
         return filled($url) && ! str_contains($url, 'placehold.co') ? $url : null;
     }
 
-    /** Angka ringkas untuk bento grid. Semua nilai dihitung dari database, null bila datanya belum ada. */
+    
     private function stats(Mountain $mountain): array
     {
         $trails = $mountain->trails;
@@ -186,7 +186,7 @@ class MountainController extends Controller
         return rtrim(rtrim(number_format($v, 1, ',', '.'), '0'), ',');
     }
 
-    /** Paragraf pembuka (lead) dan sisa paragraf, untuk tata letak editorial. */
+    
     private function overview(?string $text): array
     {
         $text = trim((string) $text);
@@ -196,7 +196,7 @@ class MountainController extends Controller
 
         $paragraphs = array_values(array_filter(preg_split('/\R{2,}/', $text)));
         if (count($paragraphs) === 1) {
-            // satu paragraf: kalimat pertama jadi lead, sisanya isi
+            
             $parts = preg_split('/(?<=[.!?])\s+/', $paragraphs[0], 2);
 
             return ['lead' => $parts[0], 'body' => isset($parts[1]) ? [$parts[1]] : []];
@@ -205,7 +205,7 @@ class MountainController extends Controller
         return ['lead' => array_shift($paragraphs), 'body' => $paragraphs];
     }
 
-    /** Tabel tarif simaksi (tingkat gunung) yang masih berlaku hari ini. Null bila belum ada data. */
+    
     private function permit(Mountain $mountain): ?array
     {
         $today = today();
@@ -245,7 +245,7 @@ class MountainController extends Controller
         ];
     }
 
-    /** Titik untuk peta Leaflet: puncak, basecamp tiap jalur, dan camp. Hanya yang punya koordinat. */
+    
     private function mapPoints(Mountain $mountain): array
     {
         $points = [];

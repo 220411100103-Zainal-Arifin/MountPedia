@@ -6,10 +6,7 @@ use App\Models\Mountain;
 use App\Models\WeatherForecast;
 use Illuminate\Database\Seeder;
 
-/**
- * Prakiraan cuaca acak untuk pengembangan UI.
- * Pada produksi tabel ini diisi oleh scheduled command yang mengambil data dari penyedia cuaca.
- */
+
 class WeatherSeeder extends Seeder
 {
     public function run(): void

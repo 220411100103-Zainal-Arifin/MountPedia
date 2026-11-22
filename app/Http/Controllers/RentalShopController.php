@@ -21,7 +21,7 @@ class RentalShopController extends Controller
         $province = $request->query('provinsi');
         $mountain = $request->query('gunung');
 
-        // Nilai yang tidak valid diabaikan, bukan menyebabkan error
+        
         $filters = [
             'q' => is_string($q) ? mb_substr(trim($q), 0, 80) : '',
             'provinsi' => is_string($province) ? $province : '',
@@ -33,7 +33,7 @@ class RentalShopController extends Controller
             ->join('regions', 'regions.id', '=', 'rental_shops.region_id')
             ->select('rental_shops.*', 'regions.province', 'regions.regency')
             ->addSelect([
-                // jumlah barang & harga termurah, untuk ringkasan di kartu
+                
                 'items_count' => DB::table('rental_items')
                     ->selectRaw('count(*)')
                     ->whereColumn('rental_items.rental_shop_id', 'rental_shops.id'),
@@ -62,12 +62,12 @@ class RentalShopController extends Controller
             ->paginate(self::PER_PAGE)
             ->withQueryString();
 
-        // ?page= melebihi halaman terakhir: arahkan ke halaman terakhir
+        
         if ($shops->currentPage() > $shops->lastPage()) {
             return redirect()->to($shops->url($shops->lastPage()));
         }
 
-        // gunung yang dilayani tiap toko di halaman ini (terdekat lebih dulu)
+        
         $mountainsByShop = DB::table('shop_mountains')
             ->join('mountains', 'mountains.id', '=', 'shop_mountains.mountain_id')
             ->whereIn('shop_mountains.rental_shop_id', $shops->pluck('id'))
@@ -90,7 +90,7 @@ class RentalShopController extends Controller
         ]);
     }
 
-    /** Halaman detail satu tempat sewa: /sewa/{slug} */
+    
     public function show(string $slug)
     {
         $shop = RentalShop::query()
@@ -99,7 +99,7 @@ class RentalShopController extends Controller
             ->where('rental_shops.slug', $slug)
             ->firstOrFail();
 
-        // ---- kontak -------------------------------------------------------
+        
         $waNumber = self::waNumber($shop->whatsapp ?: $shop->phone);
         $waUrl = fn (string $text) => $waNumber
             ? 'https://wa.me/'.$waNumber.'?text='.rawurlencode($text)
@@ -113,7 +113,7 @@ class RentalShopController extends Controller
             default => null,
         };
 
-        // ---- foto ---------------------------------------------------------
+        
         $photos = DB::table('rental_shop_photos')
             ->where('rental_shop_id', $shop->id)
             ->orderBy('sort_order')->orderBy('id')
@@ -124,7 +124,7 @@ class RentalShopController extends Controller
             $photos = [['url' => $shop->image_url, 'caption' => '']];
         }
 
-        // ---- katalog barang ----------------------------------------------
+        
         $rows = DB::table('rental_items as ri')
             ->leftJoin('gear_items as gi', 'gi.id', '=', 'ri.gear_item_id')
             ->leftJoin('gear_categories as gc', 'gc.id', '=', 'gi.gear_category_id')
@@ -162,7 +162,7 @@ class RentalShopController extends Controller
             'max' => $g->max('price'),
         ])->values()->all();
 
-        // ---- gunung yang dilayani ----------------------------------------
+        
         $mountains = DB::table('shop_mountains')
             ->join('mountains', 'mountains.id', '=', 'shop_mountains.mountain_id')
             ->where('shop_mountains.rental_shop_id', $shop->id)
@@ -171,7 +171,7 @@ class RentalShopController extends Controller
             ->get(['mountains.name', 'mountains.slug', 'shop_mountains.distance_km_to_basecamp as km', 'shop_mountains.note'])
             ->all();
 
-        // ---- ulasan -------------------------------------------------------
+        
         $reviewQuery = fn () => DB::table('rental_shop_reviews')
             ->where('rental_shop_id', $shop->id)
             ->where('is_published', true);
@@ -219,7 +219,7 @@ class RentalShopController extends Controller
         ]);
     }
 
-    /** "0812-3456-789" / "+62 812..." -> "62812..." untuk wa.me; null bila bukan nomor. */
+    
     private static function waNumber(?string $raw): ?string
     {
         $digits = preg_replace('/\D/', '', (string) $raw);

@@ -6,10 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-/**
- * Halaman Perlengkapan butuh slug (URL detail) dan gambar per perlengkapan.
- * Aman dijalankan bila kolomnya sudah ada.
- */
+
 return new class extends Migration
 {
     public function up(): void
@@ -23,7 +20,7 @@ return new class extends Migration
             }
         });
 
-        // isi slug untuk baris yang sudah ada
+        
         DB::table('gear_items')->whereNull('slug')->orderBy('id')->each(function ($row) {
             DB::table('gear_items')->where('id', $row->id)->update(['slug' => Str::slug($row->name)]);
         });

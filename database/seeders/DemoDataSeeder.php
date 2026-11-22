@@ -14,11 +14,7 @@ use App\Models\TrailStatusLog;
 use App\Models\TripType;
 use Illuminate\Database\Seeder;
 
-/**
- * Data fiktif tambahan untuk menguji pagination, pencarian, dan filter.
- * Jalankan setelah DatabaseSeeder:
- *   php artisan db:seed --class=DemoDataSeeder
- */
+
 class DemoDataSeeder extends Seeder
 {
     public function run(): void
@@ -41,7 +37,7 @@ class DemoDataSeeder extends Seeder
                 ->state(fn () => ['trail_id' => $trails->random()->id])
                 ->create();
 
-            // status terbaru: sebagian besar buka, sisanya dibatasi/tutup
+            
             $log = TrailStatusLog::factory()->for($mountain);
             match (fake()->numberBetween(1, 10)) {
                 1 => $log->closed()->create(),
