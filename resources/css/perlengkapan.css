@@ -1,23 +1,38 @@
+/* ==========================================================================
+   Halaman Perlengkapan: memakai gunung.css (kerangka, filter, masonry, pager).
+   Berkas ini hanya memuat selisihnya. Muat SESUDAH gunung.css.
+   ========================================================================== */
 
-
-
+/* latar saat gunung.js/perlengkapan.js tidak memasang foto: cahaya lembut */
 .explorer__backdrop {
     background-image:
-        radial-gradient(60% 90% at 82% 0%, rgba(244, 180, 58, 0.16), transparent 68%),
-        radial-gradient(55% 80% at 8% 30%, rgba(169, 220, 188, 0.14), transparent 72%);
+        radial-gradient(
+            60% 90% at 82% 0%,
+            rgba(244, 180, 58, 0.16),
+            transparent 68%
+        ),
+        radial-gradient(
+            55% 80% at 8% 30%,
+            rgba(169, 220, 188, 0.14),
+            transparent 72%
+        );
 }
 
-
+/* chip "Bisa disewa" ikut di kiri, bersebelahan dengan dropdown */
 .explorer .chips.chips--inline {
     margin-left: 0;
 }
 
-
+/* kartu tanpa foto: warna dasar per kategori + ikon besar yang samar */
 .mx-card--empty .mx-card__media {
     display: grid;
     place-items: center;
     background:
-        radial-gradient(120% 90% at 28% 18%, rgba(255, 255, 255, 0.16), transparent 60%),
+        radial-gradient(
+            120% 90% at 28% 18%,
+            rgba(255, 255, 255, 0.16),
+            transparent 60%
+        ),
         linear-gradient(160deg, var(--tone, #1f5a40) 0%, #0b1410 120%);
 }
 .mx-card__icon {
@@ -29,7 +44,7 @@
     opacity: 0.4;
 }
 
-
+/* badge prioritas (muncul saat filter jenis pendakian aktif) */
 .mx-card__badge[data-tone="wajib"] > .dot {
     background: var(--gold);
     box-shadow: 0 0 0 3px rgba(244, 180, 58, 0.22);
@@ -43,7 +58,7 @@
     box-shadow: 0 0 0 3px rgba(154, 165, 177, 0.22);
 }
 
-
+/* nama kategori + label sewa di baris bawah kartu */
 .mx-card__meta .mx-card__elev {
     text-transform: none;
     letter-spacing: 0.02em;

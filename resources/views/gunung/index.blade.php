@@ -24,56 +24,62 @@
         </header>
 
         <section class="explorer__filters container" aria-label="Pencarian dan filter">
-            <form method="GET" action="{{ route('mountains.index') }}" role="search" data-filter-form>
-                <div class="search">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-                    <input
-                        type="search"
-                        name="q"
-                        value="{{ $filters['q'] }}"
-                        placeholder="Cari nama gunung atau kabupaten"
-                        aria-label="Cari nama gunung atau kabupaten"
-                        maxlength="80"
-                        autocomplete="off"
-                    >
-                    <button class="search__btn" type="submit">Cari</button>
-                </div>
-
-                <div class="filters__row">
-                    <label class="select">
-                        <span class="sr-only">Provinsi</span>
-                        <select name="provinsi" data-autosubmit @class(['is-active' => $filters['provinsi'] !== ''])>
-                            <option value="">Semua provinsi</option>
-                            @foreach ($provinces as $province)
-                                <option value="{{ $province }}" @selected($filters['provinsi'] === $province)>{{ $province }}</option>
-                            @endforeach
-                        </select>
+            <form class="fbar" method="GET" action="{{ route('mountains.index') }}" role="search" data-filter-form>
+                <div class="fbar__box">
+                    <label class="fbar__search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+                        <input
+                            type="search"
+                            name="q"
+                            value="{{ $filters['q'] }}"
+                            placeholder="Cari nama gunung atau kabupaten"
+                            aria-label="Cari nama gunung atau kabupaten"
+                            maxlength="80"
+                            autocomplete="off"
+                        >
                     </label>
 
-                    <label class="select">
-                        <span class="sr-only">Ketinggian</span>
-                        <select name="mdpl" data-autosubmit @class(['is-active' => $filters['mdpl'] !== ''])>
-                            <option value="">Semua ketinggian</option>
-                            @foreach ($elevationRanges as $key => $range)
-                                <option value="{{ $key }}" @selected($filters['mdpl'] === $key)>{{ $range[2] }}</option>
-                            @endforeach
-                        </select>
-                    </label>
+                    <div class="fbar__opts">
+                        <label class="fbar__select">
+                            <span class="sr-only">Provinsi</span>
+                            <select name="provinsi" data-autosubmit @class(['is-active' => $filters['provinsi'] !== ''])>
+                                <option value="">Semua provinsi</option>
+                                @foreach ($provinces as $province)
+                                    <option value="{{ $province }}" @selected($filters['provinsi'] === $province)>{{ $province }}</option>
+                                @endforeach
+                            </select>
+                        </label>
 
-                    <fieldset class="chips">
-                        <legend class="sr-only">Status pendakian</legend>
-                        @foreach ($statusChips as $value => $label)
-                            <label class="chip">
-                                <input type="radio" name="status" value="{{ $value }}" data-autosubmit @checked($filters['status'] === $value)>
-                                <span>
-                                    @if ($value !== '')
-                                        <i class="dot" data-status="{{ $value }}"></i>
-                                    @endif
-                                    {{ $label }}
-                                </span>
-                            </label>
-                        @endforeach
-                    </fieldset>
+                        <label class="fbar__select">
+                            <span class="sr-only">Ketinggian</span>
+                            <select name="mdpl" data-autosubmit @class(['is-active' => $filters['mdpl'] !== ''])>
+                                <option value="">Semua ketinggian</option>
+                                @foreach ($elevationRanges as $key => $range)
+                                    <option value="{{ $key }}" @selected($filters['mdpl'] === $key)>{{ $range[2] }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+
+                        <fieldset class="fbar__seg">
+                            <legend class="sr-only">Status pendakian</legend>
+                            @foreach ($statusChips as $value => $label)
+                                <label>
+                                    <input type="radio" name="status" value="{{ $value }}" data-autosubmit @checked($filters['status'] === $value)>
+                                    <span>
+                                        @if ($value !== '')
+                                            <i class="dot" data-status="{{ $value }}"></i>
+                                        @endif
+                                        {{ $label }}
+                                    </span>
+                                </label>
+                            @endforeach
+                        </fieldset>
+                    </div>
+
+                    <button class="fbar__btn" type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+                        <span>Cari</span>
+                    </button>
                 </div>
             </form>
         </section>

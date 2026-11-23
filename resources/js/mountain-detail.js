@@ -1,9 +1,17 @@
+/* Halaman detail gunung
+   - ilustrasi bawaan (scene.js) untuk gunung tanpa foto
+   - scrollspy + navigasi section yang menempel
+   - peta Leaflet (dimuat saat mendekati layar)
+   - lightbox galeri (<dialog>) dan carousel rekomendasi */
 import { sceneFor } from "./scene.js";
 
 const reduceMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
 ).matches;
 
+/* ------------------------------------------------------------------
+   Ilustrasi untuk elemen [data-scene="slug"]
+   ------------------------------------------------------------------ */
 function paintScenes() {
     document.querySelectorAll("[data-scene]").forEach((el) => {
         const scene = sceneFor(el.dataset.scene);
@@ -12,6 +20,9 @@ function paintScenes() {
     });
 }
 
+/* ------------------------------------------------------------------
+   Navigasi section: scrollspy + status "menempel"
+   ------------------------------------------------------------------ */
 function initSectionNav() {
     const nav = document.querySelector("[data-section-nav]");
     if (!nav) return;
@@ -24,7 +35,7 @@ function initSectionNav() {
         .filter(Boolean);
     const scroller = nav.querySelector("[data-section-nav-scroll]");
 
-    const OFFSET = 140;
+    const OFFSET = 140; // tinggi nav menempel + sedikit ruang
     let current = null;
     let ticking = false;
 
@@ -34,7 +45,7 @@ function initSectionNav() {
         links.forEach((a) => {
             const on = a.getAttribute("href") === "#" + id;
             a.setAttribute("aria-current", on ? "true" : "false");
-
+            // geser tautan aktif ke tengah (untuk layar sempit, navigasinya bisa di-scroll)
             if (on && scroller && scroller.scrollWidth > scroller.clientWidth) {
                 scroller.scrollTo({
                     left:
@@ -52,7 +63,7 @@ function initSectionNav() {
         for (const s of sections) {
             if (s.getBoundingClientRect().top <= OFFSET) active = s.id;
         }
-
+        // di dasar halaman, section terakhir dianggap aktif
         if (
             window.innerHeight + window.scrollY >=
                 document.documentElement.scrollHeight - 4 &&
@@ -60,7 +71,7 @@ function initSectionNav() {
         ) {
             active = sections[sections.length - 1].id;
         }
-
+        // sebelum section pertama tercapai: belum ada yang aktif
         if (active) setActive(active);
         else if (current) {
             current = null;
@@ -81,6 +92,7 @@ function initSectionNav() {
     window.addEventListener("resize", update);
     update();
 
+    // nama gunung muncul di bar setelah bar menempel
     const sentinel = document.querySelector("[data-nav-sentinel]");
     if (sentinel && "IntersectionObserver" in window) {
         new IntersectionObserver(([e]) => {
@@ -91,6 +103,9 @@ function initSectionNav() {
     }
 }
 
+/* ------------------------------------------------------------------
+   Peta Leaflet
+   ------------------------------------------------------------------ */
 const PIN = {
     summit: {
         cls: "bg-pine-900 text-white",
@@ -98,7 +113,7 @@ const PIN = {
     },
     basecamp: {
         cls: "bg-white text-pine-800",
-        icon: null,
+        icon: null, // diisi nomor jalur
     },
     camp: {
         cls: "bg-gold text-pine-950",
@@ -114,7 +129,9 @@ function initMap() {
     let points = [];
     try {
         points = JSON.parse(dataEl.textContent || "[]");
-    } catch (e) {}
+    } catch (e) {
+        /* data rusak */
+    }
     if (!points.length) return;
 
     const load = async () => {
@@ -127,8 +144,8 @@ function initMap() {
         el.querySelector("[data-map-loading]")?.remove();
 
         const map = L.map(el, {
-            scrollWheelZoom: false,
-            dragging: !mobile,
+            scrollWheelZoom: false, // jangan "menjebak" scroll halaman
+            dragging: !mobile, // di layar sentuh: geser dengan dua jari
             zoomSnap: 0.5,
         });
 
@@ -210,6 +227,7 @@ function initMap() {
         if (bounds.length === 1) map.setView(bounds[0], 12);
         else map.fitBounds(bounds, { padding: [56, 56], maxZoom: 14 });
 
+        // daftar titik di bawah peta -> fokus ke penanda
         const items = document.querySelectorAll("[data-map-focus]");
         items.forEach((btn) =>
             btn.addEventListener("click", () => {
@@ -229,6 +247,7 @@ function initMap() {
         new ResizeObserver(() => map.invalidateSize()).observe(el);
     };
 
+    // muat Leaflet dan ubin peta hanya ketika peta mendekati layar
     if (!("IntersectionObserver" in window)) {
         load();
         return;
@@ -245,6 +264,9 @@ function initMap() {
     io.observe(el);
 }
 
+/* ------------------------------------------------------------------
+   Lightbox galeri (<dialog>)
+   ------------------------------------------------------------------ */
 function initLightbox() {
     const dlg = document.querySelector("[data-lightbox]");
     const items = [...document.querySelectorAll("[data-lightbox-item]")];
@@ -296,6 +318,44 @@ function initLightbox() {
     });
 }
 
+/* ------------------------------------------------------------------
+   Tab rekomendasi perlengkapan (tektok / camping 1-3+ malam)
+   ------------------------------------------------------------------ */
+function initGear() {
+    const root = document.querySelector("[data-gear]");
+    if (!root) return;
+
+    const tabs = [...root.querySelectorAll("[data-gear-tab]")];
+    const panels = [...root.querySelectorAll("[data-gear-panel]")];
+
+    const select = (key, focus) => {
+        tabs.forEach((t) => {
+            const on = t.dataset.gearTab === key;
+            t.setAttribute("aria-selected", String(on));
+            t.tabIndex = on ? 0 : -1;
+            if (on && focus) t.focus();
+        });
+        panels.forEach((p) => {
+            p.hidden = p.dataset.gearPanel !== key;
+        });
+    };
+
+    tabs.forEach((tab, i) => {
+        tab.addEventListener("click", () => select(tab.dataset.gearTab));
+        tab.addEventListener("keydown", (e) => {
+            if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+            const next =
+                (i + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) %
+                tabs.length;
+            select(tabs[next].dataset.gearTab, true);
+            e.preventDefault();
+        });
+    });
+}
+
+/* ------------------------------------------------------------------
+   Carousel horizontal (rekomendasi gunung)
+   ------------------------------------------------------------------ */
 function initCarousel() {
     document.querySelectorAll("[data-carousel]").forEach((root) => {
         const track = root.querySelector("[data-carousel-track]");
@@ -332,4 +392,5 @@ paintScenes();
 initSectionNav();
 initMap();
 initLightbox();
+initGear();
 initCarousel();

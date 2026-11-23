@@ -3,10 +3,10 @@
     $priorityLabels = ['wajib' => 'Wajib', 'disarankan' => 'Disarankan', 'opsional' => 'Opsional'];
     $tripChips = ['' => 'Semua', 'tektok' => 'Tektok', 'camping' => 'Camping'];
 
-    
+    // warna dasar kartu yang belum punya foto, bergilir menurut kategori
     $tones = ['#1f5a40', '#2b4f6b', '#6b4a2b', '#4c3a6b', '#6b2b3a', '#2b6b64'];
 
-    
+    // ikon sementara per kategori (stroke); kategori lain memakai ikon gunung
     $icons = [
         'Pakaian' => '<path d="M8 4l-5 3 2 4 3-1v10h8V10l3 1 2-4-5-3a4 4 0 01-8 0z"/>',
         'Tas & Shelter' => '<path d="M3 20L12 4l9 16H3z"/><path d="M12 4v16M9 20l3-6 3 6"/>',
@@ -37,48 +37,55 @@
         </header>
 
         <section class="explorer__filters container" aria-label="Pencarian dan filter">
-            <form method="GET" action="{{ route('gear.index') }}" role="search" data-filter-form>
-                <div class="search">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-                    <input
-                        type="search"
-                        name="q"
-                        value="{{ $filters['q'] }}"
-                        placeholder="Cari nama perlengkapan"
-                        aria-label="Cari nama perlengkapan"
-                        maxlength="80"
-                        autocomplete="off"
-                    >
-                    <button class="search__btn" type="submit">Cari</button>
-                </div>
-
-                <div class="filters__row">
-                    <label class="select">
-                        <span class="sr-only">Kategori</span>
-                        <select name="kategori" data-autosubmit @class(['is-active' => $filters['kategori'] !== ''])>
-                            <option value="">Semua kategori</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}" @selected($filters['kategori'] === (string) $category->id)>{{ $category->name }}</option>
-                            @endforeach
-                        </select>
+            <form class="fbar" method="GET" action="{{ route('gear.index') }}" role="search" data-filter-form>
+                <div class="fbar__box">
+                    <label class="fbar__search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+                        <input
+                            type="search"
+                            name="q"
+                            value="{{ $filters['q'] }}"
+                            placeholder="Cari nama perlengkapan"
+                            aria-label="Cari nama perlengkapan"
+                            maxlength="80"
+                            autocomplete="off"
+                        >
                     </label>
 
-                    <div class="chips chips--inline">
-                        <label class="chip">
-                            <input type="checkbox" name="sewa" value="1" data-autosubmit @checked($filters['sewa'] === '1')>
-                            <span>Bisa disewa</span>
+                    <div class="fbar__opts">
+                        <label class="fbar__select">
+                            <span class="sr-only">Kategori</span>
+                            <select name="kategori" data-autosubmit @class(['is-active' => $filters['kategori'] !== ''])>
+                                <option value="">Semua kategori</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}" @selected($filters['kategori'] === (string) $category->id)>{{ $category->name }}</option>
+                                @endforeach
+                            </select>
                         </label>
+
+                        <label class="fbar__toggle fbar__toggle--half">
+                            <input type="checkbox" name="sewa" value="1" data-autosubmit @checked($filters['sewa'] === '1')>
+                            <span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+                                Bisa disewa
+                            </span>
+                        </label>
+
+                        <fieldset class="fbar__seg">
+                            <legend class="sr-only">Jenis pendakian</legend>
+                            @foreach ($tripChips as $value => $label)
+                                <label>
+                                    <input type="radio" name="jenis" value="{{ $value }}" data-autosubmit @checked($filters['jenis'] === $value)>
+                                    <span>{{ $label }}</span>
+                                </label>
+                            @endforeach
+                        </fieldset>
                     </div>
 
-                    <fieldset class="chips">
-                        <legend class="sr-only">Jenis pendakian</legend>
-                        @foreach ($tripChips as $value => $label)
-                            <label class="chip">
-                                <input type="radio" name="jenis" value="{{ $value }}" data-autosubmit @checked($filters['jenis'] === $value)>
-                                <span>{{ $label }}</span>
-                            </label>
-                        @endforeach
-                    </fieldset>
+                    <button class="fbar__btn" type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+                        <span>Cari</span>
+                    </button>
                 </div>
             </form>
         </section>

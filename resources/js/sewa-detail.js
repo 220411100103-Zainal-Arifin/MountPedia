@@ -7,6 +7,9 @@
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { initLightbox } from "./lightbox.js";
+import { dragScroll } from "./drag-scroll.js";
+
+dragScroll(document.querySelector(".subnav ul"));
 
 /* ---------- Scrollspy untuk navigasi sticky ---------- */
 (() => {

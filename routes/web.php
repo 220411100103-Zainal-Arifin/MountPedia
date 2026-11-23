@@ -1,7 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\GearController as AdminGearController;
 use App\Http\Controllers\Admin\LoginController;
+use App\Http\Controllers\Admin\MountainController as AdminMountainController;
+use App\Http\Controllers\Admin\RentalItemController as AdminRentalItemController;
+use App\Http\Controllers\Admin\RentalShopController as AdminRentalShopController;
 use App\Http\Controllers\GearController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MountainController;
@@ -27,8 +31,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/login', 'create')->name('login');
         Route::post('/login', 'store')->middleware('throttle:5,1')->name('login.store');
     });
-    Route::middleware(['auth', 'admin'])->controller(DashboardController::class)->group(function () {
-        Route::get('/', 'index')->name('dashboard');
+    Route::middleware(['auth', 'admin'])->group(function () {
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::prefix('gunung')->name('mountains.')->controller(AdminMountainController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+        });
+        Route::prefix('gear')->name('gear.')->controller(AdminGearController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+        });
+        Route::prefix('tempat-sewa')->name('shops.')->controller(AdminRentalShopController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+        });
+        Route::prefix('barang-sewa')->name('items.')->controller(AdminRentalItemController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+        });
     });
 });
 Route::post('/admin/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('logout');

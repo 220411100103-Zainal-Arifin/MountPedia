@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GearRecommendation;
 use App\Models\Mountain;
 use App\Models\Region;
 use App\Models\TrailStatusLog;
@@ -13,7 +14,7 @@ class MountainController extends Controller
 {
     private const PER_PAGE = 12;
 
-    
+    /** kunci query (?mdpl=) => [min, max, label] */
     private const ELEVATION_RANGES = [
         '0-1499' => [0, 1499, 'Di bawah 1.500 mdpl'],
         '1500-2499' => [1500, 2499, '1.500 – 2.499 mdpl'],
@@ -30,7 +31,7 @@ class MountainController extends Controller
         $range = $request->query('mdpl');
         $status = $request->query('status');
 
-        
+        // Nilai yang tidak valid diabaikan, bukan menyebabkan error
         $filters = [
             'q' => is_string($q) ? mb_substr(trim($q), 0, 80) : '',
             'provinsi' => is_string($province) ? $province : '',
@@ -38,8 +39,8 @@ class MountainController extends Controller
             'status' => is_string($status) && in_array($status, self::STATUSES, true) ? $status : '',
         ];
 
-        
-        
+        // Status terkini tingkat gunung (periode mencakup hari ini, laporan terbaru).
+        // Dipakai dua kali: sebagai kolom `current_status` dan sebagai syarat filter.
         $currentStatus = fn () => TrailStatusLog::query()
             ->select('status')
             ->whereColumn((new TrailStatusLog)->qualifyColumn('mountain_id'), (new Mountain)->qualifyColumn('id'))
@@ -69,7 +70,7 @@ class MountainController extends Controller
             ->paginate(self::PER_PAGE)
             ->withQueryString();
 
-        
+        // ?page= melebihi halaman terakhir: arahkan ke halaman terakhir
         if ($mountains->currentPage() > $mountains->lastPage()) {
             return redirect()->to($mountains->url($mountains->lastPage()));
         }
@@ -99,7 +100,7 @@ class MountainController extends Controller
             'photos',
         ]);
 
-        
+        // Status terkini: tingkat gunung, dan tingkat jalur (menimpa status gunung untuk jalur itu)
         $status = $mountain->statusLogs()->mountainLevel()->activeToday()
             ->orderByDesc('reported_at')->first();
 
@@ -107,13 +108,13 @@ class MountainController extends Controller
             ->orderByDesc('reported_at')->get()
             ->unique('trail_id')->keyBy('trail_id');
 
-        
+        // Prakiraan terdekat per titik (basecamp / puncak)
         $weather = $mountain->weatherForecasts()
             ->where('forecast_at', '>=', now()->subHours(3))
             ->orderBy('forecast_at')->get()
             ->groupBy('point')->map(fn (Collection $g) => $g->first());
 
-        
+        // Rekomendasi: provinsi yang sama lebih dulu, lalu ketinggian yang paling berdekatan
         $related = Mountain::query()
             ->with('region')
             ->withCurrentStatus()
@@ -134,18 +135,19 @@ class MountainController extends Controller
             'weather' => $weather,
             'mapPoints' => $this->mapPoints($mountain),
             'sharedCamps' => $mountain->campsites->whereNull('trail_id')->values(),
+            'gear' => $this->gear($mountain),
             'related' => $related,
             'jsonLd' => $this->jsonLd($mountain),
         ]);
     }
 
-    
+    /** image_url dari seeder hanya placeholder; abaikan agar halaman memakai ilustrasi bawaan. */
     private function realImage(?string $url): ?string
     {
         return filled($url) && ! str_contains($url, 'placehold.co') ? $url : null;
     }
 
-    
+    /** Angka ringkas untuk bento grid. Semua nilai dihitung dari database, null bila datanya belum ada. */
     private function stats(Mountain $mountain): array
     {
         $trails = $mountain->trails;
@@ -186,7 +188,7 @@ class MountainController extends Controller
         return rtrim(rtrim(number_format($v, 1, ',', '.'), '0'), ',');
     }
 
-    
+    /** Paragraf pembuka (lead) dan sisa paragraf, untuk tata letak editorial. */
     private function overview(?string $text): array
     {
         $text = trim((string) $text);
@@ -196,7 +198,7 @@ class MountainController extends Controller
 
         $paragraphs = array_values(array_filter(preg_split('/\R{2,}/', $text)));
         if (count($paragraphs) === 1) {
-            
+            // satu paragraf: kalimat pertama jadi lead, sisanya isi
             $parts = preg_split('/(?<=[.!?])\s+/', $paragraphs[0], 2);
 
             return ['lead' => $parts[0], 'body' => isset($parts[1]) ? [$parts[1]] : []];
@@ -205,7 +207,7 @@ class MountainController extends Controller
         return ['lead' => array_shift($paragraphs), 'body' => $paragraphs];
     }
 
-    
+    /** Tabel tarif simaksi (tingkat gunung) yang masih berlaku hari ini. Null bila belum ada data. */
     private function permit(Mountain $mountain): ?array
     {
         $today = today();
@@ -245,7 +247,7 @@ class MountainController extends Controller
         ];
     }
 
-    
+    /** Titik untuk peta Leaflet: puncak, basecamp tiap jalur, dan camp. Hanya yang punya koordinat. */
     private function mapPoints(Mountain $mountain): array
     {
         $points = [];
@@ -315,5 +317,76 @@ class MountainController extends Controller
         }
 
         return $data;
+    }
+
+    /**
+     * Rekomendasi perlengkapan per skenario: tektok, camping 1 / 2 / 3+ malam.
+     * Aturan khusus gunung menimpa aturan umum untuk barang yang sama.
+     * `url` terisi hanya bila barangnya tersedia di daftar Perlengkapan (punya item sewa).
+     */
+    private function gear(Mountain $mountain): array
+    {
+        $rules = GearRecommendation::query()
+            ->forMountain($mountain->id)
+            ->with(['tripType', 'gearItem' => fn ($q) => $q->withCount('rentalItems'), 'gearItem.category'])
+            ->get();
+
+        $scenarios = [
+            ['key' => 'tektok', 'trip' => 'tektok', 'nights' => 0, 'label' => 'Tektok'],
+            ['key' => 'camping-1', 'trip' => 'camping', 'nights' => 1, 'label' => 'Camping 1 malam'],
+            ['key' => 'camping-2', 'trip' => 'camping', 'nights' => 2, 'label' => 'Camping 2 malam'],
+            ['key' => 'camping-3', 'trip' => 'camping', 'nights' => 3, 'label' => 'Camping 3+ malam'],
+        ];
+        $rank = ['wajib' => 0, 'disarankan' => 1, 'opsional' => 2];
+
+        $result = [];
+        foreach ($scenarios as $sc) {
+            $applicable = $rules->filter(fn ($r) => $r->tripType->code === $sc['trip']
+                && $r->min_nights <= $sc['nights']
+                && ($r->max_nights === null || $r->max_nights >= $sc['nights']));
+
+            // satu baris per barang: aturan khusus gunung menang, lalu min_nights yang paling spesifik
+            $items = $applicable->groupBy('gear_item_id')
+                ->map(fn ($group) => $group->sortBy([
+                    fn ($a, $b) => ($b->mountain_id !== null) <=> ($a->mountain_id !== null),
+                    fn ($a, $b) => $b->min_nights <=> $a->min_nights,
+                ])->first())
+                ->map(fn ($r) => [
+                    'name' => $r->gearItem->name,
+                    'category' => $r->gearItem->category->name,
+                    'category_order' => $r->gearItem->category->sort_order,
+                    'priority' => $r->priority,
+                    'qty' => $r->quantity_note,
+                    'note' => $r->notes,
+                    'specific' => $r->mountain_id !== null,
+                    'url' => $r->gearItem->rental_items_count > 0
+                        ? url('/perlengkapan').'?'.http_build_query(['q' => $r->gearItem->name])
+                        : null,
+                ])
+                ->sort(fn ($a, $b) => [$a['category_order'], $rank[$a['priority']] ?? 9, $a['name']]
+                    <=> [$b['category_order'], $rank[$b['priority']] ?? 9, $b['name']])
+                ->values();
+
+            if ($items->isEmpty()) {
+                continue;
+            }
+
+            $counts = $items->countBy('priority');
+            $summary = collect(['wajib' => 'wajib', 'disarankan' => 'disarankan', 'opsional' => 'opsional'])
+                ->filter(fn ($label, $key) => ($counts[$key] ?? 0) > 0)
+                ->map(fn ($label, $key) => $counts[$key].' '.$label)
+                ->implode(' · ');
+
+            $result[] = [
+                'key' => $sc['key'],
+                'label' => $sc['label'],
+                'summary' => $summary,
+                'groups' => $items->groupBy('category')
+                    ->map(fn ($g, $category) => ['category' => $category, 'items' => $g->all()])
+                    ->values()->all(),
+            ];
+        }
+
+        return $result;
     }
 }

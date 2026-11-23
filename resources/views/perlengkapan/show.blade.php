@@ -12,6 +12,7 @@
     :title="$item->name"
     :description="$metaDescription"
     :assets="['resources/css/sewa-detail.css', 'resources/css/gear-detail.css', 'resources/js/gear-detail.js']"
+    :footer="false"
 >
     <main class="shop gear">
         <div class="container">

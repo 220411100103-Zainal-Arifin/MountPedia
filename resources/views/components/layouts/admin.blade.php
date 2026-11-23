@@ -1,5 +1,6 @@
 @props([
     'title' => 'Dashboard',
+    'section' => 'Pages',
 ])
 
 @php
@@ -8,16 +9,16 @@
     $initials = collect(preg_split('/\s+/', trim($name)))->take(2)
         ->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('');
 
-    
+    // [label, ikon, url, aktif?]
     $menu = [
         'Main Menu' => [
             ['Dashboard', 'layout-dashboard', route('admin.dashboard'), request()->routeIs('admin.dashboard')],
         ],
         'Master Data' => [
-            ['Gunung & Jalur', 'mountain', '#', false],
-            ['Gear & Kategori', 'backpack', '#', false],
-            ['Tempat Sewa', 'store', '#', false],
-            ['Barang Sewa', 'package', '#', false],
+            ['Gunung & Jalur', 'mountain', route('admin.mountains.index'), request()->routeIs('admin.mountains.*')],
+            ['Gear & Kategori', 'backpack', route('admin.gear.index'), request()->routeIs('admin.gear.*')],
+            ['Tempat Sewa', 'store', route('admin.shops.index'), request()->routeIs('admin.shops.*')],
+            ['Barang Sewa', 'package', route('admin.items.index'), request()->routeIs('admin.items.*')],
         ],
         'Content' => [
             ['Artikel & Informasi', 'newspaper', '#', false],
@@ -89,7 +90,7 @@
                 <x-admin.icon name="panel-left" />
             </button>
             <div class="topbar__title">
-                <p class="crumb">Pages <span>/</span> {{ $title }}</p>
+                <p class="crumb">{{ $section }} <span>/</span> {{ $title }}</p>
                 <h1>{{ $title }}</h1>
             </div>
 

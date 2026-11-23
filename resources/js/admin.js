@@ -1,4 +1,4 @@
-
+/* Perilaku shell admin: sidebar (ciut/buka, off-canvas di layar kecil) dan dropdown profil */
 (() => {
     "use strict";
 
@@ -13,7 +13,7 @@
             root.classList.add("is-collapsed");
         }
     } catch (e) {
-        
+        /* penyimpanan tidak tersedia */
     }
 
     const toggle = document.querySelector("[data-sidebar-toggle]");
@@ -27,7 +27,7 @@
             try {
                 localStorage.setItem(KEY, collapsed ? "collapsed" : "open");
             } catch (e) {
-                
+                /* abaikan */
             }
         });
 
@@ -58,4 +58,24 @@
             }
         });
     });
+
+    // Form filter di halaman daftar: pilihan langsung memicu pencarian; kolom kosong tidak ikut ke URL
+    document.querySelectorAll("[data-filter-form]").forEach((form) => {
+        const submit = () =>
+            form.requestSubmit ? form.requestSubmit() : form.submit();
+        form.querySelectorAll("[data-autosubmit]").forEach((el) =>
+            el.addEventListener("change", submit),
+        );
+        form.addEventListener("submit", () =>
+            form.querySelectorAll("input[name], select[name]").forEach((el) => {
+                if (el.value === "") el.disabled = true;
+            }),
+        );
+    });
+    // tombol Kembali (bfcache) bisa memulihkan halaman dengan kolom yang masih nonaktif
+    window.addEventListener("pageshow", () =>
+        document
+            .querySelectorAll("[data-filter-form] [disabled]")
+            .forEach((el) => (el.disabled = false)),
+    );
 })();

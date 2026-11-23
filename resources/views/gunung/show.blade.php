@@ -3,7 +3,7 @@
     $elev = number_format($mountain->elevation_mdpl, 0, ',', '.');
     $hasPhotos = $mountain->photos->isNotEmpty();
 
-    
+    // tanggal dan jam dalam bahasa Indonesia (null aman)
     $dateId = fn ($d, $fmt = 'j F Y') => $d?->locale('id')->translatedFormat($fmt);
     $rupiah = fn ($v) => $v === null ? '—' : 'Rp '.number_format($v, 0, ',', '.');
     $dms = fn ($v) => number_format((float) $v, 4, ',', '.').'°';
@@ -26,10 +26,11 @@
         ['Koordinat puncak', $coords],
     ], fn ($f) => filled($f[1]));
 
-    
+    // navigasi section: hanya section yang benar-benar punya isi
     $sections = array_values(array_filter([
         ['ringkasan', 'Ringkasan', true],
         ['jalur', 'Jalur', true],
+        ['perlengkapan', 'Perlengkapan', count($gear) > 0],
         ['peta', 'Peta', count($mapPoints) > 0],
         ['galeri', 'Galeri', $hasPhotos],
         ['serupa', 'Gunung lain', $related->isNotEmpty()],
@@ -44,13 +45,16 @@
     :description="$description"
     :overlay="true"
     :assets="['resources/css/app.css', 'resources/js/mountain-detail.js']"
+    :footer="false"
 >
     <x-slot:head>
         <script type="application/ld+json">{!! json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
     </x-slot:head>
 
-    
-    <header class="relative isolate flex h-[80svh] min-h-[34rem] items-end overflow-hidden bg-pine-950 text-white lg:h-[88svh]">
+    {{-- ================================================================
+         1. HERO panorama
+         ================================================================ --}}
+    <header class="relative isolate flex min-h-[max(34rem,80svh)] items-end overflow-hidden bg-pine-950 text-white lg:min-h-[max(34rem,88svh)]">
         @if ($heroPhoto)
             <img src="{{ $heroPhoto }}" alt="Panorama {{ $mountain->name }}" fetchpriority="high" class="absolute inset-0 -z-20 size-full object-cover">
         @else
@@ -59,18 +63,9 @@
         <div class="absolute inset-0 -z-10 bg-gradient-to-t from-pine-950 via-pine-950/35 to-pine-950/25"></div>
         <div class="absolute inset-0 -z-10 bg-gradient-to-r from-pine-950/70 via-pine-950/10 to-transparent"></div>
 
-        <div class="container pb-36 pt-32 lg:pb-44">
-            <nav aria-label="Breadcrumb">
-                <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-white/70">
-                    <li><a href="{{ url('/') }}" class="transition hover:text-white">Beranda</a></li>
-                    <li aria-hidden="true">/</li>
-                    <li><a href="{{ route('mountains.index') }}" class="transition hover:text-white">Gunung</a></li>
-                    <li aria-hidden="true">/</li>
-                    <li aria-current="page" class="text-white">{{ $mountain->name }}</li>
-                </ol>
-            </nav>
+        <div class="container pb-36 pt-36 lg:pb-44 lg:pt-40">
 
-            <p class="mt-8 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.24em] text-white/85 before:h-0.5 before:w-7 before:bg-gold">{{ $place }}</p>
+            <p class="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.24em] text-white/85 before:h-0.5 before:w-7 before:bg-gold">{{ $place }}</p>
             <h1 class="mt-4 max-w-[12ch] text-balance font-display text-[clamp(4.25rem,12vw,10.5rem)] uppercase leading-[0.88] tracking-[0.005em]">{{ $mountain->name }}</h1>
 
             <div class="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
@@ -87,7 +82,9 @@
     </header>
 
     <div class="bg-paper text-ink">
-        
+        {{-- ================================================================
+             2. INFORMASI CEPAT: bento grid (menumpuk di tepi bawah hero)
+             ================================================================ --}}
         <div class="container relative z-10 -mt-28 lg:-mt-32">
             <div class="grid grid-cols-2 gap-3 rounded-[2rem] bg-paper p-3 shadow-[0_40px_80px_-40px_rgba(8,26,19,0.5)] lg:grid-cols-6 lg:grid-rows-2">
                 <x-mountain.bento-tile label="Ketinggian puncak" tone="forest" class="col-span-2 lg:row-span-2">
@@ -141,7 +138,9 @@
             </div>
         </div>
 
-        
+        {{-- ================================================================
+             3. NAVIGASI SECTION (menempel di atas saat di-scroll)
+             ================================================================ --}}
         <div data-nav-sentinel class="mt-10 h-px"></div>
         <div data-section-nav data-stuck="false" class="group sticky top-0 z-30 border-b border-line bg-paper/85 backdrop-blur-xl">
             <div class="container flex items-center gap-6">
@@ -158,10 +157,13 @@
             </div>
         </div>
 
-        
+        {{-- ================================================================
+             KONTEN: kolom utama + sidebar menempel
+             Di layar kecil sidebar tampil lebih dulu (status & tarif adalah yang paling dicari).
+             ================================================================ --}}
         <div class="container grid gap-14 py-14 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-16 lg:py-20 xl:grid-cols-[minmax(0,1fr)_23rem]">
 
-            
+            {{-- ============ 7. SIDEBAR informasi penting ============ --}}
             <aside aria-label="Informasi penting" class="lg:order-2">
                 <div class="lg:sticky lg:top-[4.75rem] lg:max-h-[calc(100svh-6rem)] lg:overflow-y-auto lg:overscroll-contain lg:[scrollbar-width:thin]">
                     <div class="divide-y divide-line rounded-[2rem] border border-line bg-white p-6 sm:p-7">
@@ -279,7 +281,9 @@
 
                         <x-mountain.info-block title="Siapkan pendakian">
                             <ul class="-my-1 divide-y divide-line text-sm font-medium text-pine-900">
-                                <li><a href="{{ url('/perlengkapan?gunung='.$mountain->slug) }}" class="group flex items-center justify-between py-3 transition hover:text-pine-600">Rekomendasi perlengkapan <span aria-hidden="true" class="transition group-hover:translate-x-1">→</span></a></li>
+                                @if (count($gear))
+                                    <li><a href="#perlengkapan" class="group flex items-center justify-between py-3 transition hover:text-pine-600">Apa yang perlu dibawa <span aria-hidden="true" class="transition group-hover:translate-y-0.5">↓</span></a></li>
+                                @endif
                                 <li><a href="{{ url('/sewa?gunung='.$mountain->slug) }}" class="group flex items-center justify-between py-3 transition hover:text-pine-600">Sewa alat di sekitar gunung <span aria-hidden="true" class="transition group-hover:translate-x-1">→</span></a></li>
                             </ul>
                         </x-mountain.info-block>
@@ -287,10 +291,10 @@
                 </div>
             </aside>
 
-            
+            {{-- ============ Kolom utama ============ --}}
             <div class="min-w-0 space-y-24 lg:order-1 lg:space-y-32">
 
-                
+                {{-- 4. RINGKASAN: tata letak editorial dua kolom --}}
                 <x-mountain.section id="ringkasan" eyebrow="Ringkasan" :title="'Mengenal '.$mountain->name">
                     <div class="grid gap-10 md:grid-cols-[12rem_minmax(0,1fr)] md:gap-14">
                         @if (count($facts))
@@ -317,7 +321,7 @@
                     </div>
                 </x-mountain.section>
 
-                
+                {{-- 5. JALUR: kartu informasi horizontal --}}
                 <x-mountain.section id="jalur" eyebrow="Jalur pendakian" title="Pilih jalurmu">
                     @if ($mountain->trails->isEmpty())
                         <p class="rounded-2xl bg-pine-100 p-6 text-sm leading-6 text-pine-900">Belum ada data jalur untuk gunung ini.</p>
@@ -359,7 +363,43 @@
                     @endif
                 </x-mountain.section>
 
-                
+                {{-- PERLENGKAPAN: rekomendasi gear menurut jenis pendakian dan lama bermalam --}}
+                @if (count($gear))
+                    <x-mountain.section id="perlengkapan" eyebrow="Perlengkapan" title="Yang perlu dibawa">
+                        <div data-gear>
+                            <p class="mb-8 max-w-[60ch] text-[15px] leading-7 text-ink-soft">
+                                Pilih jenis pendakian dan lama bermalam untuk melihat kebutuhannya. Barang yang tersedia di halaman Perlengkapan punya tautan untuk langsung mencarinya.
+                            </p>
+
+                            <div role="tablist" aria-label="Jenis pendakian" class="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]">
+                                @foreach ($gear as $scenario)
+                                    <button
+                                        type="button"
+                                        role="tab"
+                                        id="gear-tab-{{ $scenario['key'] }}"
+                                        aria-controls="gear-panel-{{ $scenario['key'] }}"
+                                        aria-selected="{{ $loop->first ? 'true' : 'false' }}"
+                                        @if (! $loop->first) tabindex="-1" @endif
+                                        data-gear-tab="{{ $scenario['key'] }}"
+                                        class="shrink-0 rounded-full border border-line bg-white px-5 py-2.5 text-[13px] font-medium text-ink-soft transition hover:border-pine-700 hover:text-pine-900 aria-selected:border-pine-800 aria-selected:bg-pine-800 aria-selected:text-white"
+                                    >{{ $scenario['label'] }}</button>
+                                @endforeach
+                            </div>
+
+                            <div class="mt-8">
+                                @foreach ($gear as $scenario)
+                                    <x-mountain.gear-panel :scenario="$scenario" :mountain-name="$mountain->name" :active="$loop->first" />
+                                @endforeach
+                            </div>
+
+                            <p class="mt-10 text-sm">
+                                <a href="{{ url('/perlengkapan') }}" class="group inline-flex items-center gap-2 font-medium text-pine-800 transition hover:text-pine-600">Lihat semua perlengkapan <span aria-hidden="true" class="transition group-hover:translate-x-1">→</span></a>
+                            </p>
+                        </div>
+                    </x-mountain.section>
+                @endif
+
+                {{-- 6. PETA interaktif (Leaflet) --}}
                 @if (count($mapPoints))
                     <x-mountain.section id="peta" eyebrow="Peta" title="Titik penting di lapangan">
                         <p class="mb-8 max-w-[60ch] text-[15px] leading-7 text-ink-soft">
@@ -408,7 +448,7 @@
                     </x-mountain.section>
                 @endif
 
-                
+                {{-- 8. GALERI: masonry (hanya tampil bila sudah ada foto) --}}
                 @if ($hasPhotos)
                     <x-mountain.section id="galeri" eyebrow="Galeri" title="Dari lapangan">
                         <ul class="columns-2 gap-3 sm:columns-3 [&>li]:mb-3">
@@ -457,7 +497,9 @@
             </div>
         </div>
 
-        
+        {{-- ================================================================
+             9. REKOMENDASI: kartu yang bisa digeser horizontal
+             ================================================================ --}}
         @if ($related->isNotEmpty())
             <section id="serupa" data-spy-section data-carousel aria-labelledby="serupa-title" class="scroll-mt-24 border-t border-line bg-white py-16 lg:py-24">
                 <div class="container flex flex-wrap items-end justify-between gap-6">

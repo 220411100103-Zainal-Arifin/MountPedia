@@ -16,6 +16,7 @@
     :title="$shop->name"
     :description="$metaDescription"
     :assets="['resources/css/sewa-detail.css', 'resources/js/sewa-detail.js']"
+    :footer="false"
 >
     <main class="shop">
         <div class="container">

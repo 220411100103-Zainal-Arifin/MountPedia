@@ -1,4 +1,7 @@
-
+/* ==========================================================================
+   Detail Tempat Sewa (/sewa/{slug}) — halaman terang di bawah navbar gelap.
+   Memakai token layout.css (--gold, --display, --body, --pad-x, .container).
+   ========================================================================== */
 
 .shop {
     --bg: #f5f6f3;
@@ -15,9 +18,9 @@
 
     background: var(--bg);
     color: var(--ink);
-    padding-block: clamp(20px, 3vw, 32px) clamp(48px, 7vw, 96px);
+    padding-block: clamp(20px, 3vw, 32px) clamp(28px, 3vw, 40px);
     line-height: 1.55;
-    overflow-x: clip; 
+    overflow-x: clip; /* subnav selebar layar tanpa menimbulkan scroll horizontal */
 }
 .shop *:focus-visible {
     outline: 2px solid var(--green);
@@ -58,7 +61,7 @@
     flex: none;
 }
 
-
+/* ---------- Buttons ---------- */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -116,7 +119,7 @@
     text-underline-offset: 3px;
 }
 
-
+/* ---------- Galeri ---------- */
 .gallery {
     position: relative;
     display: grid;
@@ -183,7 +186,7 @@
     background: #eef1ec;
 }
 
-
+/* ---------- Identitas ---------- */
 .identity {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -243,7 +246,7 @@
     gap: 10px;
 }
 
-
+/* status operasional */
 .status {
     display: inline-flex;
     align-items: center;
@@ -270,7 +273,7 @@
     color: var(--mute);
 }
 
-
+/* rating bintang (mask: tidak bergantung pada glyph font) */
 .stars {
     --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8L12 2.5z'/%3E%3C/svg%3E");
     display: inline-block;
@@ -286,7 +289,7 @@
     mask: var(--star) 0 0 / var(--s) var(--s) repeat-x;
 }
 
-
+/* ---------- Navigasi sticky ---------- */
 .subnav {
     position: sticky;
     top: 0;
@@ -339,7 +342,7 @@
     transform: scaleX(1);
 }
 
-
+/* ---------- Tata letak dua kolom ---------- */
 .shop__layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 340px;
@@ -353,7 +356,7 @@
     padding-top: 28px;
 }
 
-
+/* ---------- Section ---------- */
 .sec {
     padding-block: clamp(36px, 5vw, 60px);
     border-top: 1px solid var(--line);
@@ -361,6 +364,9 @@
 }
 .sec:first-child {
     border-top: 0;
+}
+.sec:last-child {
+    padding-bottom: 0; /* jarak bawah halaman diatur oleh .shop */
 }
 .sec__head {
     margin-bottom: 26px;
@@ -399,7 +405,7 @@
     color: var(--mute);
 }
 
-
+/* ---------- Empty state ---------- */
 .empty-state {
     display: flex;
     align-items: flex-start;
@@ -436,7 +442,7 @@
     margin-top: 12px;
 }
 
-
+/* ---------- Tentang (editorial) ---------- */
 .about {
     display: grid;
     grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
@@ -497,7 +503,7 @@
     color: #fff;
 }
 
-
+/* ---------- Katalog ---------- */
 .toolbar {
     display: grid;
     gap: 14px;
@@ -707,7 +713,7 @@
     margin-top: 2px;
 }
 
-
+/* ---------- Harga & ketentuan ---------- */
 .pricing {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
@@ -762,7 +768,7 @@
     color: var(--green);
 }
 
-
+/* ---------- Peta ---------- */
 .map {
     height: clamp(280px, 36vw, 400px);
     border-radius: var(--radius);
@@ -811,7 +817,7 @@
     color: var(--green);
 }
 
-
+/* ---------- Ulasan ---------- */
 .reviews {
     display: grid;
     grid-template-columns: 220px minmax(0, 1fr);
@@ -867,12 +873,28 @@
     color: var(--ink-2);
 }
 
-
+/* ---------- Sidebar ---------- */
 .aside__panel {
     padding: 8px 24px 20px;
     border: 1px solid var(--line);
     border-radius: var(--radius);
     background: var(--panel);
+
+    /* panel punya scroll sendiri bila lebih tinggi dari layar, terpisah dari scroll halaman:
+       tinggi maksimum = tinggi layar dikurangi jarak sticky (navbar bagian, atas, bawah) */
+    max-height: calc(100vh - var(--nav-h) - 20px - 28px - 20px);
+    max-height: calc(100dvh - var(--nav-h) - 20px - 28px - 20px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #c3ccc4 transparent;
+}
+.aside__panel::-webkit-scrollbar {
+    width: 6px;
+}
+.aside__panel::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background: #c3ccc4;
 }
 .aside__block {
     display: grid;
@@ -923,12 +945,12 @@ a.aside__line:hover {
     color: var(--mute);
 }
 
-
+/* ---------- Bilah CTA (layar kecil) ---------- */
 .ctabar {
     display: none;
 }
 
-
+/* ---------- Lightbox ---------- */
 .lightbox {
     width: 100vw;
     max-width: 100vw;
@@ -993,17 +1015,22 @@ a.aside__line:hover {
     transform: scaleX(-1);
 }
 
-
+/* ---------- Tablet ---------- */
 @media (max-width: 980px) {
     .shop__layout {
         grid-template-columns: minmax(0, 1fr);
+    }
+    .aside__panel {
+        max-height: none;
+        overflow: visible;
     }
     .aside {
         position: static;
         padding-top: 0;
         padding-top: 8px;
     }
-    .shop {
+    /* ruang untuk bilah CTA yang menempel di bawah (hanya halaman tempat sewa) */
+    .shop:has(.ctabar) {
         padding-bottom: 96px;
     }
     .ctabar {
@@ -1026,7 +1053,7 @@ a.aside__line:hover {
         align-items: start;
     }
     .identity__cta {
-        display: none; 
+        display: none; /* tombol sudah ada di bilah bawah */
     }
 }
 @media (max-width: 760px) {
@@ -1084,4 +1111,18 @@ a.aside__line:hover {
 .about__text .empty-state__text {
     font-size: 14px;
     color: var(--mute);
+}
+
+/* ---------- Geser dengan drag mouse (tab & rail) ---------- */
+.subnav ul,
+.rail {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    cursor: grab;
+}
+.subnav ul.is-dragging,
+.rail.is-dragging {
+    cursor: grabbing;
+    scroll-snap-type: none;
+    user-select: none;
 }

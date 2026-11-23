@@ -3,6 +3,7 @@
    panah geser untuk "Perlengkapan Serupa". Halaman tetap terbaca tanpa JS.
    ========================================================================== */
 import { initLightbox } from "./lightbox.js";
+import { dragScroll } from "./drag-scroll.js";
 
 const lightbox = initLightbox();
 
@@ -37,6 +38,7 @@ const lightbox = initLightbox();
     const rail = document.querySelector("[data-rail]");
     if (!rail) return;
 
+    dragScroll(rail);
     const prev = document.querySelector("[data-rail-prev]");
     const next = document.querySelector("[data-rail-next]");
     const step = () => Math.max(240, Math.round(rail.clientWidth * 0.8));
