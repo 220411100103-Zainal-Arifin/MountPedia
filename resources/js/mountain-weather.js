@@ -16,7 +16,7 @@
             true,
         );
     const set = (el, field, text) => {
-        const tasrget = el.matches(`[data-f="${field}"]`)
+        const target = el.matches(`[data-f="${field}"]`)
             ? el
             : el.querySelector(`[data-f="${field}"]`);
         if (target) target.textContent = text;
@@ -116,6 +116,7 @@
                 : "";
             show("ready");
         } catch (e) {
+            console.error("Gagal memuat prakiraan cuaca:", e);
             show("error");
         } finally {
             clearTimeout(timer);

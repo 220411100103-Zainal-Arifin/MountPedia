@@ -8,11 +8,6 @@ class TrailRequest extends AdminRequest
 {
     public const DIFFICULTIES = ['mudah', 'sedang', 'sulit', 'ekstrem'];
 
-    protected function prepareForValidation(): void
-    {
-        $this->merge(['is_active' => $this->boolean('is_active')]);
-    }
-
     public function rules(): array
     {
         return [
@@ -34,7 +29,8 @@ class TrailRequest extends AdminRequest
             'duration_down_hours' => ['nullable', 'numeric', 'min:0', 'max:99.9'],
             'difficulty' => ['nullable', Rule::in(self::DIFFICULTIES)],
             'description' => ['nullable', 'string', 'max:5000'],
-            'is_active' => ['boolean'],
+            'status' => ['required', Rule::in(['buka', 'tutup'])],
+            'status_reason' => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -53,6 +49,8 @@ class TrailRequest extends AdminRequest
             'duration_down_hours' => 'Durasi turun',
             'difficulty' => 'Tingkat kesulitan',
             'description' => 'Deskripsi',
+            'status' => 'Status jalur',
+            'status_reason' => 'Alasan status',
         ];
     }
 }

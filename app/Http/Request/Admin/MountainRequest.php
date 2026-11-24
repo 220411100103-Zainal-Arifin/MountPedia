@@ -19,8 +19,12 @@ class MountainRequest extends AdminRequest
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'managing_authority' => ['nullable', 'string', 'max:150'],
+            'image'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'image_url' => ['nullable', 'url', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
+            'status' => ['required', Rule::in(['buka', 'tutup'])],
+            'status_reason' => ['nullable', 'string', 'max:255'],
+            'status_source_url' => ['nullable', 'url', 'max:255'],
         ];
     }
 
@@ -34,8 +38,12 @@ class MountainRequest extends AdminRequest
             'latitude' => 'Lintang',
             'longitude' => 'Bujur',
             'managing_authority' => 'Pengelola',
+            'image'     => 'File gambar',
             'image_url' => 'URL gambar',
             'description' => 'Deskripsi',
+            'status' => 'Status pendakian',
+            'status_reason' => 'Alasan penutupan',
+            'status_source_url' => 'URL sumber status',
         ];
     }
 }

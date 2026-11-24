@@ -31,20 +31,71 @@
 </section>
 
 <section class="panel form-panel">
-    <header class="panel__head"><h2>Lokasi</h2><span>Opsional, dipakai untuk peta</span></header>
+    <header class="panel__head"><h2>Lokasi</h2><span>Koordinat puncak gunung, dipakai untuk peta</span></header>
     <div class="form-grid">
-        <x-admin.field label="Lintang (latitude)" name="latitude" type="number" :value="$mountain->latitude"
-                       step="any" min="-90" max="90" placeholder="-8.108000" inputmode="decimal" />
-        <x-admin.field label="Bujur (longitude)" name="longitude" type="number" :value="$mountain->longitude"
-                       step="any" min="-180" max="180" placeholder="112.922000" inputmode="decimal" />
+        <x-admin.map-picker
+            lat-name="latitude"  :lat-value="$mountain->latitude"
+            lng-name="longitude" :lng-value="$mountain->longitude"
+            label="Koordinat puncak gunung" />
     </div>
 </section>
+
+@php
+    use Illuminate\Support\Facades\Storage;
+    $existingImg = $mountain->image_url ?? '';
+    $isPlaceholder = str_contains($existingImg, 'placehold.co');
+    $hasRealImg = $existingImg !== '' && !$isPlaceholder;
+    $isExternalImg = $hasRealImg && str_starts_with($existingImg, 'http');
+    $imgSrc = $hasRealImg ? ($isExternalImg ? $existingImg : Storage::url($existingImg)) : '';
+@endphp
 
 <section class="panel form-panel">
     <header class="panel__head"><h2>Deskripsi &amp; gambar</h2><span>Teks pengantar dan gambar sampul</span></header>
     <div class="form-grid">
-        <x-admin.field label="URL gambar" name="image_url" type="url" :value="$mountain->image_url" span maxlength="255"
-                       placeholder="https://..." hint="Kosongkan untuk memakai ilustrasi bawaan." />
+
+        {{-- Pratinjau gambar saat ini (mode edit) --}}
+        @if ($hasRealImg)
+            <div class="f-field f-field--wide">
+                <span class="f-label">Gambar saat ini</span>
+                <img src="{{ $imgSrc }}" alt="Gambar {{ $mountain->name }}"
+                     style="max-height:180px;border-radius:.5rem;border:1px solid var(--border,#d1d5db);object-fit:cover;display:block;">
+            </div>
+        @endif
+
+        {{-- Upload file --}}
+        <div class="f-field f-field--wide">
+            <label class="f-label" for="f-image">Upload gambar baru</label>
+            <input id="f-image" type="file" name="image" accept="image/jpeg,image/png,image/webp"
+                   class="f-input {{ $errors->has('image') ? 'is-invalid' : '' }}">
+            <p class="f-hint">Format: JPG, PNG, WebP. Maks 2 MB. Jika upload gambar, URL di bawah diabaikan.</p>
+            @error('image') <p class="f-error" role="alert">{{ $message }}</p> @enderror
+        </div>
+
+        {{-- URL eksternal (fallback) --}}
+        <x-admin.field label="Atau gunakan URL gambar eksternal" name="image_url" type="url"
+                       :value="$isExternalImg ? $existingImg : ''"
+                       span maxlength="255" placeholder="https://..."
+                       hint="Hanya diisi bila tidak meng-upload file. Kosongkan keduanya untuk memakai ilustrasi bawaan." />
+
         <x-admin.textarea label="Deskripsi" name="description" :value="$mountain->description" maxlength="5000" />
+    </div>
+</section>
+
+<section class="panel form-panel">
+    <header class="panel__head"><h2>Status Pendakian</h2><span>Menentukan apakah gunung ini terbuka untuk umum</span></header>
+    <div class="form-grid">
+        <x-admin.select label="Status pendakian" name="status" required>
+            <option value="buka" @selected(old('status', $mountain->status ?? 'buka') === 'buka')>🟢 Dibuka</option>
+            <option value="tutup" @selected(old('status', $mountain->status ?? 'buka') === 'tutup')>🔴 Ditutup</option>
+        </x-admin.select>
+
+        <x-admin.field label="Alasan penutupan / catatan status" name="status_reason"
+                       :value="$mountain->status_reason" maxlength="255"
+                       placeholder="Contoh: Ditutup sementara karena peningkatan aktivitas vulkanik"
+                       hint="Diisi bila gunung ditutup. Muncul di halaman publik." />
+
+        <x-admin.field label="URL sumber status" name="status_source_url" type="url"
+                       :value="$mountain->status_source_url" maxlength="255" span
+                       placeholder="https://..." hint="Tautan ke pengumuman resmi (TNBTS, BKSDA, dsb.)" />
     </div>
 </section>

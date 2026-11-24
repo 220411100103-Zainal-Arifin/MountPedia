@@ -10,6 +10,7 @@ use App\Models\Region;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /** Master data: Gunung (daftar, tambah, ubah, hapus). Jalur ada di TrailController. */
@@ -28,7 +29,7 @@ class MountainController extends Controller
             'provinsi' => $this->text($request, 'provinsi', 100),
             'status' => $this->choice($request, 'status', ['buka', 'tutup']),
             'tingkat' => $this->choice($request, 'tingkat', ['mudah', 'sedang', 'sulit', 'ekstrem']),
-            'aktif' => $this->choice($request, 'aktif', ['1', '0']),
+            'aktif' => $this->choice($request, 'status_jalur', ['buka', 'tutup']),
         ];
         $like = $this->like($filters['q']);
 
@@ -58,7 +59,7 @@ class MountainController extends Controller
                     ->orWhere('trails.basecamp_name', 'like', $like)
                     ->orWhere('mountains.name', 'like', $like)))
                 ->when($filters['tingkat'] !== '', fn ($query) => $query->where('trails.difficulty', $filters['tingkat']))
-                ->when($filters['aktif'] !== '', fn ($query) => $query->where('trails.is_active', (int) $filters['aktif']))
+                ->when($filters['aktif'] !== '', fn ($query) => $query->where('trails.status', $filters['aktif']))
                 ->orderBy('mountains.name')
                 ->orderBy('trails.name')
                 ->paginate(self::PER_PAGE)
@@ -95,6 +96,14 @@ class MountainController extends Controller
     {
         $data = $request->validated();
         $data['slug'] = $data['slug'] ?? $this->uniqueSlug($data['name']);
+        $data['status_updated_at'] = now();
+
+        // Tangani upload gambar
+        unset($data['image']);
+        if ($request->hasFile('image')) {
+            $data['image_url'] = $request->file('image')->store('mountains', 'public');
+        }
+        // Jika image_url kosong setelah validasi, biarkan null
 
         $mountain = Mountain::create($data);
 
@@ -105,9 +114,16 @@ class MountainController extends Controller
 
     public function edit(Mountain $mountain)
     {
+        $mountain->load([
+            'region',
+            'trails' => fn ($q) => $q->orderBy('name'),
+            'campsites' => fn ($q) => $q->orderBy('elevation_mdpl')->orderBy('name'),
+            'campsites.trail',
+        ]);
+
         return view('admin.mountains.edit', [
             'mountain' => $mountain,
-            'regions' => $this->regionOptions(),
+            'regions'  => $this->regionOptions(),
         ]);
     }
 
@@ -115,6 +131,24 @@ class MountainController extends Controller
     {
         $data = $request->validated();
         $data['slug'] = $data['slug'] ?? $mountain->slug;
+
+        // Tangani upload gambar
+        unset($data['image']);
+        if ($request->hasFile('image')) {
+            // Hapus file lama jika itu hasil upload (bukan URL eksternal)
+            if ($mountain->image_url && !str_starts_with($mountain->image_url, 'http')) {
+                Storage::disk('public')->delete($mountain->image_url);
+            }
+            $data['image_url'] = $request->file('image')->store('mountains', 'public');
+        } elseif (!$request->filled('image_url')) {
+            // Tidak ada file baru dan URL dikosongkan → set null
+            $data['image_url'] = null;
+        }
+
+        // Catat waktu jika status berubah
+        if (isset($data['status']) && $data['status'] !== $mountain->status) {
+            $data['status_updated_at'] = now();
+        }
 
         $mountain->update($data);
 

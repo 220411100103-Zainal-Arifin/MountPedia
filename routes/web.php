@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CampsiteController as AdminCampsiteController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GearController as AdminGearController;
 use App\Http\Controllers\Admin\LoginController;
@@ -51,6 +52,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/{trail:id}/edit', 'edit')->name('edit');
             Route::put('/{trail:id}', 'update')->name('update');
             Route::delete('/{trail:id}', 'destroy')->name('destroy');
+        });
+        Route::prefix('camp')->name('campsites.')->controller(AdminCampsiteController::class)->group(function () {
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{campsite:id}/edit', 'edit')->name('edit');
+            Route::put('/{campsite:id}', 'update')->name('update');
+            Route::delete('/{campsite:id}', 'destroy')->name('destroy');
         });
         Route::prefix('gear')->name('gear.')->controller(AdminGearController::class)->group(function () {
             Route::get('/', 'index')->name('index');

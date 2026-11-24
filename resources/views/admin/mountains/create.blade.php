@@ -3,7 +3,7 @@
         <a class="btn btn--ghost" href="{{ route('admin.mountains.index') }}">Kembali ke daftar</a>
     </x-admin.page-head>
 
-    <form method="POST" action="{{ route('admin.mountains.store') }}" novalidate>
+    <form method="POST" action="{{ route('admin.mountains.store') }}" enctype="multipart/form-data" novalidate>
         @csrf
         @include('admin.mountains._form')
 

@@ -54,10 +54,10 @@
                 </label>
                 <label class="tb-select">
                     <span class="sr-only">Status jalur</span>
-                    <select name="aktif" data-autosubmit>
-                        <option value="">Aktif &amp; nonaktif</option>
-                        <option value="1" @selected($filters['aktif'] === '1')>Aktif</option>
-                        <option value="0" @selected($filters['aktif'] === '0')>Nonaktif</option>
+                    <select name="status_jalur" data-autosubmit>
+                        <option value="">Semua status</option>
+                        <option value="buka" @selected($filters['aktif'] === 'buka')>Dibuka</option>
+                        <option value="tutup" @selected($filters['aktif'] === 'tutup')>Ditutup</option>
                     </select>
                 </label>
             @endif
@@ -149,7 +149,7 @@
                                             —
                                         @endif
                                     </td>
-                                    <td data-label="Status"><x-admin.badge :tone="$t->is_active ? 'green' : 'gray'">{{ $t->is_active ? 'Aktif' : 'Nonaktif' }}</x-admin.badge></td>
+                                    <td data-label="Status"><x-admin.badge :tone="$statusTone[$t->status] ?? 'gray'">{{ $statusLabel[$t->status] ?? '—' }}</x-admin.badge></td>
                                     <td class="cell--actions"><x-admin.row-actions :view="route('mountains.show', $t->mountain_slug)"
                                             :edit="route('admin.trails.edit', $t->id)"
                                             :delete="route('admin.trails.destroy', $t->id)"
