@@ -4,13 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Admin\Concerns\ReadsFilters;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\MountainRequest;
 use App\Models\Mountain;
 use App\Models\Region;
-use App\Models\TrailStatusLog;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
-/** Master data: Gunung & Jalur (daftar). Tambah/ubah/hapus menyusul. */
+/** Master data: Gunung (daftar, tambah, ubah, hapus). Jalur ada di TrailController. */
 class MountainController extends Controller
 {
     use ReadsFilters;
@@ -24,7 +26,7 @@ class MountainController extends Controller
         $filters = [
             'q' => $this->text($request, 'q'),
             'provinsi' => $this->text($request, 'provinsi', 100),
-            'status' => $this->choice($request, 'status', ['buka', 'dibatasi', 'tutup']),
+            'status' => $this->choice($request, 'status', ['buka', 'tutup']),
             'tingkat' => $this->choice($request, 'tingkat', ['mudah', 'sedang', 'sulit', 'ekstrem']),
             'aktif' => $this->choice($request, 'aktif', ['1', '0']),
         ];
@@ -34,26 +36,16 @@ class MountainController extends Controller
         $trails = null;
 
         if ($tab === 'gunung') {
-            // status terkini tingkat gunung, sama seperti di halaman publik
-            $currentStatus = fn () => TrailStatusLog::query()
-                ->select('status')
-                ->whereColumn((new TrailStatusLog)->qualifyColumn('mountain_id'), (new Mountain)->qualifyColumn('id'))
-                ->mountainLevel()
-                ->activeToday()
-                ->orderByDesc('reported_at')
-                ->limit(1);
-
             $mountains = Mountain::query()
                 ->with('region')
                 ->withCount('trails')
-                ->addSelect(['current_status' => $currentStatus()])
                 ->when($filters['q'] !== '', fn ($query) => $query->where(fn ($w) => $w
                     ->where('name', 'like', $like)
                     ->orWhereIn('region_id', Region::query()->select('id')->where('regency', 'like', $like))))
                 ->when($filters['provinsi'] !== '', fn ($query) => $query
                     ->whereIn('region_id', Region::query()->select('id')->where('province', $filters['provinsi'])))
                 ->when($filters['status'] !== '', fn ($query) => $query
-                    ->where($currentStatus(), '=', $filters['status']))
+                    ->where('status', $filters['status']))
                 ->orderBy('name')
                 ->paginate(self::PER_PAGE)
                 ->withQueryString();
@@ -73,6 +65,11 @@ class MountainController extends Controller
                 ->withQueryString();
         }
 
+        $page = $tab === 'gunung' ? $mountains : $trails;
+        if ($page->currentPage() > $page->lastPage()) {
+            return redirect()->to($page->url($page->lastPage()));
+        }
+
         return view('admin.mountains.index', [
             'tab' => $tab,
             'mountains' => $mountains,
@@ -84,5 +81,78 @@ class MountainController extends Controller
                 ->whereIn('id', Mountain::query()->select('region_id'))
                 ->distinct()->orderBy('province')->pluck('province'),
         ]);
+    }
+
+    public function create()
+    {
+        return view('admin.mountains.create', [
+            'mountain' => new Mountain,
+            'regions' => $this->regionOptions(),
+        ]);
+    }
+
+    public function store(MountainRequest $request)
+    {
+        $data = $request->validated();
+        $data['slug'] = $data['slug'] ?? $this->uniqueSlug($data['name']);
+
+        $mountain = Mountain::create($data);
+
+        return redirect()
+            ->route('admin.mountains.index')
+            ->with('success', "{$mountain->name} berhasil ditambahkan.");
+    }
+
+    public function edit(Mountain $mountain)
+    {
+        return view('admin.mountains.edit', [
+            'mountain' => $mountain,
+            'regions' => $this->regionOptions(),
+        ]);
+    }
+
+    public function update(MountainRequest $request, Mountain $mountain)
+    {
+        $data = $request->validated();
+        $data['slug'] = $data['slug'] ?? $mountain->slug;
+
+        $mountain->update($data);
+
+        return redirect()
+            ->route('admin.mountains.index')
+            ->with('success', "Perubahan {$mountain->name} berhasil disimpan.");
+    }
+
+    public function destroy(Mountain $mountain)
+    {
+        $name = $mountain->name;
+
+        try {
+            // jalur, camp, foto, status, simaksi, dan rekomendasi gear ikut terhapus (ON DELETE CASCADE)
+            $mountain->delete();
+        } catch (QueryException $e) {
+            return back()->with('error', "{$name} tidak dapat dihapus karena masih dipakai data lain.");
+        }
+
+        return back()->with('success', "{$name} telah dihapus.");
+    }
+
+    /** Wilayah dikelompokkan per provinsi untuk dropdown. */
+    private function regionOptions()
+    {
+        return Region::query()->orderBy('province')->orderBy('regency')->get()->groupBy('province');
+    }
+
+    private function uniqueSlug(string $name): string
+    {
+        $base = Str::slug($name) ?: 'gunung';
+        $slug = $base;
+        $i = 2;
+
+        while (Mountain::query()->where('slug', $slug)->exists()) {
+            $slug = $base.'-'.$i++;
+        }
+
+        return $slug;
     }
 }

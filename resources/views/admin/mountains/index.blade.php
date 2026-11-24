@@ -1,13 +1,13 @@
 @php
-    $statusTone = ['buka' => 'green', 'dibatasi' => 'amber', 'tutup' => 'red'];
-    $statusLabel = ['buka' => 'Dibuka', 'dibatasi' => 'Dibatasi', 'tutup' => 'Ditutup'];
+    $statusTone = ['buka' => 'green', 'tutup' => 'red'];
+    $statusLabel = ['buka' => 'Dibuka', 'tutup' => 'Ditutup'];
     $diffTone = ['mudah' => 'green', 'sedang' => 'amber', 'sulit' => 'red', 'ekstrem' => 'dark'];
     $current = $tab === 'gunung' ? $mountains : $trails;
     $num = fn ($v) => rtrim(rtrim(number_format((float) $v, 1, ',', '.'), '0'), ',');
 @endphp
 <x-layouts.admin title="Gunung & Jalur" section="Master Data">
     <x-admin.page-head text="Kelola data gunung beserta jalur pendakiannya.">
-        <span class="btn btn--primary is-disabled" title="Tersedia di tahap berikutnya"><x-admin.icon name="plus" /> Tambah {{ $tab === 'gunung' ? 'Gunung' : 'Jalur' }}</span>
+        <a class="btn btn--primary" href="{{ $tab === 'gunung' ? route('admin.mountains.create') : route('admin.trails.create') }}"><x-admin.icon name="plus" /> Tambah {{ $tab === 'gunung' ? 'Gunung' : 'Jalur' }}</a>
     </x-admin.page-head>
 
     <x-admin.tabs route="admin.mountains.index" :active="$tab"
@@ -102,11 +102,15 @@
                                     <td class="num" data-label="Ketinggian">{{ number_format($m->elevation_mdpl, 0, ',', '.') }} mdpl</td>
                                     <td class="num" data-label="Jalur">{{ $m->trails_count }}</td>
                                     <td data-label="Status">
-                                        <x-admin.badge :tone="$statusTone[$m->current_status] ?? 'gray'">
-                                            {{ $statusLabel[$m->current_status] ?? 'Belum ada' }}
+                                        <x-admin.badge :tone="$statusTone[$m->status] ?? 'gray'">
+                                            {{ $statusLabel[$m->status] ?? 'Belum ada' }}
                                         </x-admin.badge>
                                     </td>
-                                    <td class="cell--actions"><x-admin.row-actions :view="route('mountains.show', $m->slug)" /></td>
+                                    <td class="cell--actions"><x-admin.row-actions :view="route('mountains.show', $m->slug)"
+                                            :edit="route('admin.mountains.edit', $m->id)"
+                                            :delete="route('admin.mountains.destroy', $m->id)"
+                                            :name="$m->name"
+                                            :note="'Ikut terhapus: '.$m->trails_count.' jalur beserta semua camp, foto, status pendakian, dan biaya simaksi gunung ini. Tindakan ini tidak bisa dibatalkan.'" /></td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -146,7 +150,11 @@
                                         @endif
                                     </td>
                                     <td data-label="Status"><x-admin.badge :tone="$t->is_active ? 'green' : 'gray'">{{ $t->is_active ? 'Aktif' : 'Nonaktif' }}</x-admin.badge></td>
-                                    <td class="cell--actions"><x-admin.row-actions :view="route('mountains.show', $t->mountain_slug)" /></td>
+                                    <td class="cell--actions"><x-admin.row-actions :view="route('mountains.show', $t->mountain_slug)"
+                                            :edit="route('admin.trails.edit', $t->id)"
+                                            :delete="route('admin.trails.destroy', $t->id)"
+                                            :name="$t->name.' ('.$t->mountain_name.')'"
+                                            note="Status pendakian jalur ini ikut terhapus. Camp dan biaya simaksi yang terkait tetap ada tanpa jalur. Tindakan ini tidak bisa dibatalkan." /></td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -230,10 +230,6 @@
 .dot[data-status="tutup"] {
     background: #f87171;
 }
-[data-status="dibatasi"] > .dot,
-.dot[data-status="dibatasi"] {
-    background: var(--gold);
-}
 
 .explorer__bar {
     display: flex;
@@ -790,8 +786,14 @@ body:has(.explorer) .site-footer {
     outline: 2px solid var(--gold, #f4b43a);
     outline-offset: 2px;
 }
-.fbar__search:focus-within {
-    outline: none;
+/* input pencarian: tanpa kotak; seluruh bar yang diberi cincin fokus */
+.fbar__box .fbar__search input:focus-visible {
+    outline: 0;
+}
+.fbar__box:focus-within:has(.fbar__search input:focus) {
+    box-shadow:
+        0 10px 34px rgba(0, 0, 0, 0.28),
+        0 0 0 3px rgba(244, 180, 58, 0.55);
 }
 
 /* segmented control (radio "Jenis pendakian") */
@@ -849,6 +851,7 @@ body:has(.explorer) .site-footer {
         row-gap: 4px;
     }
     .fbar__opts {
+        flex-wrap: wrap;
         grid-column: 1 / -1;
         grid-row: 2;
         padding: 10px 6px 4px;

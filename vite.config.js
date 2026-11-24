@@ -24,6 +24,7 @@ export default defineConfig({
                 "resources/js/admin.js",
                 "resources/css/gear-detail.css",
                 "resources/js/gear-detail.js",
+                "resources/js/mountain-weather.js",
             ],
             refresh: true,
             fonts: [

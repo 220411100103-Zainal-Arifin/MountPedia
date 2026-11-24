@@ -10,10 +10,13 @@
 
     $statusMeta = [
         'buka' => ['Dibuka', 'bg-emerald-400'],
-        'dibatasi' => ['Dibatasi', 'bg-gold'],
         'tutup' => ['Ditutup', 'bg-red-400'],
     ];
-    [$statusLabel, $statusDot] = $statusMeta[$status?->status ?? ''] ?? ['Belum ada laporan', 'bg-slate-400'];
+    [$statusLabel, $statusDot] = $statusMeta[$mountain->status] ?? $statusMeta['buka'];
+    $isClosed = $mountain->isClosed();
+    $hasWeather = $mountain->latitude !== null && $mountain->longitude !== null;
+    $trailTotal = $mountain->trails->count();
+    $trailOpen = $mountain->trails->where('effective_status', 'buka')->count();
 
     $coords = ($mountain->latitude !== null && $mountain->longitude !== null)
         ? $dms($mountain->latitude).', '.$dms($mountain->longitude)
@@ -44,7 +47,7 @@
     :title="$mountain->name"
     :description="$description"
     :overlay="true"
-    :assets="['resources/css/app.css', 'resources/js/mountain-detail.js']"
+    :assets="['resources/css/app.css', 'resources/js/mountain-detail.js', 'resources/js/mountain-weather.js']"
     :footer="false"
 >
     <x-slot:head>
@@ -70,7 +73,7 @@
 
             <div class="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
                 <p class="font-display text-4xl leading-none tracking-wide">{{ $elev }} <span class="text-xl text-white/70">mdpl</span></p>
-                <x-mountain.status-badge :status="$status?->status" tone="glass" />
+                <x-mountain.status-badge :status="$mountain->status" tone="glass" />
                 <div class="flex flex-wrap gap-3">
                     <a href="#jalur" class="rounded-full bg-white px-6 py-3 text-xs font-medium uppercase tracking-[0.12em] text-pine-900 transition hover:bg-pine-100">Lihat jalur</a>
                     @if (count($mapPoints))
@@ -101,10 +104,12 @@
                         <i class="size-3 shrink-0 rounded-full {{ $statusDot }}"></i>{{ $statusLabel }}
                     </p>
                     <p class="mt-3 text-sm leading-6 text-ink-soft">
-                        @if ($status)
-                            Sejak {{ $dateId($status->starts_on) }}
+                        @if ($isClosed)
+                            Seluruh jalur ikut ditutup.
+                        @elseif ($trailTotal)
+                            {{ $trailOpen }} dari {{ $trailTotal }} jalur dibuka.
                         @else
-                            Belum ada laporan; tanyakan ke pengelola.
+                            Belum ada data jalur.
                         @endif
                     </p>
                 </x-mountain.bento-tile>
@@ -173,35 +178,32 @@
                                 <i class="size-3 shrink-0 rounded-full {{ $statusDot }}"></i>{{ $statusLabel }}
                             </p>
 
-                            @if ($status)
-                                @if ($status->reason)
-                                    <p class="mt-3 text-sm leading-6 text-ink-soft">{{ $status->reason }}</p>
-                                @endif
-                                <p class="mt-3 text-xs leading-5 text-ink-soft">
-                                    Berlaku sejak {{ $dateId($status->starts_on) }}@if ($status->ends_on) hingga {{ $dateId($status->ends_on) }}@endif.
-                                </p>
-                                <p class="mt-1 text-xs leading-5 text-ink-soft">
-                                    Sumber:
-                                    @if ($status->source_url)
-                                        <a href="{{ $status->source_url }}" target="_blank" rel="noopener" class="underline underline-offset-2 hover:text-pine-800">{{ $status->source_name ?: 'tautan sumber' }}</a>
-                                    @else
-                                        {{ $status->source_name ?: 'tidak dicantumkan' }}
-                                    @endif
-                                    · dilaporkan {{ $status->reported_at->locale('id')->diffForHumans() }}
-                                </p>
-                            @else
-                                <p class="mt-3 text-sm leading-6 text-ink-soft">Belum ada laporan status untuk gunung ini. Hubungi pengelola sebelum berangkat.</p>
+                            @if ($mountain->status_reason)
+                                <p class="mt-3 text-sm leading-6 text-ink-soft">{{ $mountain->status_reason }}</p>
+                            @endif
+                            @if ($isClosed)
+                                <p class="mt-3 text-sm leading-6 text-ink-soft">Selama gunung ditutup, seluruh jalur ikut ditutup.</p>
                             @endif
 
-                            @if ($trailStatuses->isNotEmpty())
+                            @if ($mountain->status_updated_at || $mountain->status_source_url)
+                                <p class="mt-3 text-xs leading-5 text-ink-soft">
+                                    @if ($mountain->status_updated_at)
+                                        Diperbarui {{ $mountain->status_updated_at->locale('id')->diffForHumans() }}
+                                    @endif
+                                    @if ($mountain->status_source_url)
+                                        @if ($mountain->status_updated_at) · @endif
+                                        <a href="{{ $mountain->status_source_url }}" target="_blank" rel="noopener" class="underline underline-offset-2 hover:text-pine-800">Sumber</a>
+                                    @endif
+                                </p>
+                            @endif
+
+                            @if ($mountain->trails->isNotEmpty())
                                 <ul class="mt-5 space-y-2 border-t border-dashed border-line pt-4 text-sm">
                                     @foreach ($mountain->trails as $t)
-                                        @if (isset($trailStatuses[$t->id]))
-                                            <li class="flex items-center justify-between gap-3">
-                                                <span class="min-w-0 truncate text-pine-900">{{ $t->name }}</span>
-                                                <x-mountain.status-badge :status="$trailStatuses[$t->id]->status" />
-                                            </li>
-                                        @endif
+                                        <li class="flex items-center justify-between gap-3">
+                                            <span class="min-w-0 truncate text-pine-900">{{ $t->name }}</span>
+                                            <x-mountain.status-badge :status="$t->effective_status" />
+                                        </li>
                                     @endforeach
                                 </ul>
                             @endif
@@ -249,33 +251,72 @@
                             </x-mountain.info-block>
                         @endif
 
-                        @if ($weather->isNotEmpty())
+                        @if ($hasWeather)
                             <x-mountain.info-block title="Prakiraan cuaca">
-                                <div class="divide-y divide-line">
-                                    @foreach (['basecamp' => 'Basecamp', 'puncak' => 'Puncak'] as $point => $pointLabel)
-                                        @if (isset($weather[$point]))
-                                            @php $w = $weather[$point]; @endphp
-                                            <div class="flex items-start justify-between gap-4 py-3 first:pt-0 last:pb-0">
+                                <div data-weather data-url="{{ route('mountains.weather', $mountain) }}">
+                                    <div data-weather-tabs role="tablist" aria-label="Titik prakiraan cuaca" class="mb-5 flex gap-2 empty:hidden"></div>
+
+                                    <div data-weather-loading aria-hidden="true" class="animate-pulse space-y-3">
+                                        <div class="h-12 w-2/3 rounded-xl bg-pine-100"></div>
+                                        <div class="h-4 w-1/2 rounded bg-pine-100"></div>
+                                        <div class="h-32 rounded-xl bg-pine-100"></div>
+                                    </div>
+
+                                    <div data-weather-error hidden>
+                                        <p class="text-sm leading-6 text-ink-soft">Prakiraan cuaca belum dapat dimuat. Coba lagi sebentar lagi.</p>
+                                        <button type="button" data-weather-retry class="mt-3 rounded-full border border-pine-800 px-4 py-2 text-[13px] font-medium text-pine-800 transition hover:bg-pine-800 hover:text-white">Coba lagi</button>
+                                    </div>
+
+                                    <div data-weather-ready aria-live="polite" hidden></div>
+
+                                    <noscript><p class="text-sm leading-6 text-ink-soft">Aktifkan JavaScript untuk melihat prakiraan cuaca.</p></noscript>
+
+                                    <p class="mt-4 text-xs leading-5 text-ink-soft">
+                                        <span data-weather-observed></span>
+                                        Persen di kanan adalah peluang hujan. Data oleh <a href="https://open-meteo.com/" target="_blank" rel="noopener" class="underline underline-offset-2 hover:text-pine-800">Open-Meteo.com</a> (CC BY 4.0), dikoreksi ke ketinggian tiap titik.
+                                    </p>
+
+                                    <template data-tpl="tab">
+                                        <button type="button" role="tab" class="rounded-full border border-line bg-white px-4 py-2 text-[13px] font-medium text-ink-soft transition hover:border-pine-700 hover:text-pine-900 aria-selected:border-pine-800 aria-selected:bg-pine-800 aria-selected:text-white"></button>
+                                    </template>
+
+                                    <template data-tpl="point">
+                                        <div>
+                                            <div class="flex items-start justify-between gap-4">
                                                 <div class="min-w-0">
-                                                    <p class="text-[11px] font-medium uppercase tracking-[0.16em] text-ink-soft">{{ $pointLabel }}</p>
-                                                    <p class="mt-1 text-sm text-pine-900">{{ $w->condition ?: 'Kondisi belum ada' }}</p>
-                                                    <p class="mt-1 text-xs leading-5 text-ink-soft">
-                                                        @if ($w->rain_probability_pct !== null)Hujan {{ $w->rain_probability_pct }}%@endif
-                                                        @if ($w->wind_kmh !== null) · angin {{ round($w->wind_kmh) }} km/jam @endif
-                                                    </p>
-                                                    <p class="mt-1 text-xs text-ink-soft">Perkiraan {{ $dateId($w->forecast_at, 'j M, H.i') }}</p>
+                                                    <p class="text-[11px] font-medium uppercase tracking-[0.16em] text-ink-soft" data-f="label"></p>
+                                                    <p class="mt-1 text-sm text-pine-900" data-f="condition"></p>
+                                                    <p class="mt-1 text-xs leading-5 text-ink-soft" data-f="gust"></p>
                                                 </div>
-                                                @if ($w->temp_c !== null)
-                                                    <p class="font-display text-5xl leading-none text-pine-900">{{ round($w->temp_c) }}°</p>
-                                                @endif
+                                                <p class="font-display text-5xl leading-none text-pine-900"><span data-f="temp"></span>°</p>
                                             </div>
-                                        @endif
-                                    @endforeach
+                                            <dl class="mt-5 grid grid-cols-3 gap-3 text-sm">
+                                                <div>
+                                                    <dt class="text-[11px] uppercase tracking-[0.14em] text-ink-soft">Terasa</dt>
+                                                    <dd class="mt-1 tabular-nums text-pine-900" data-f="feels"></dd>
+                                                </div>
+                                                <div>
+                                                    <dt class="text-[11px] uppercase tracking-[0.14em] text-ink-soft">Lembap</dt>
+                                                    <dd class="mt-1 tabular-nums text-pine-900" data-f="humidity"></dd>
+                                                </div>
+                                                <div>
+                                                    <dt class="text-[11px] uppercase tracking-[0.14em] text-ink-soft">Angin</dt>
+                                                    <dd class="mt-1 tabular-nums text-pine-900" data-f="wind"></dd>
+                                                </div>
+                                            </dl>
+                                            <ul class="mt-5 divide-y divide-line border-y border-line text-sm" data-f="days"></ul>
+                                        </div>
+                                    </template>
+
+                                    <template data-tpl="day">
+                                        <li class="flex items-center gap-3 py-2.5">
+                                            <span class="w-[4.5rem] shrink-0 text-ink-soft" data-f="day"></span>
+                                            <span class="min-w-0 flex-1 truncate text-pine-900" data-f="condition"></span>
+                                            <span class="tabular-nums text-pine-900" data-f="range"></span>
+                                            <span class="w-9 text-right text-xs tabular-nums text-ink-soft" data-f="rain"></span>
+                                        </li>
+                                    </template>
                                 </div>
-                                @php $latest = $weather->first(); @endphp
-                                <p class="mt-4 text-xs leading-5 text-ink-soft">
-                                    Sumber: {{ $latest->source ?: 'tidak dicantumkan' }} · diperbarui {{ $latest->fetched_at->locale('id')->diffForHumans() }}
-                                </p>
                             </x-mountain.info-block>
                         @endif
 
@@ -326,6 +367,13 @@
                     @if ($mountain->trails->isEmpty())
                         <p class="rounded-2xl bg-pine-100 p-6 text-sm leading-6 text-pine-900">Belum ada data jalur untuk gunung ini.</p>
                     @else
+                        @if ($isClosed)
+                            <p class="mb-8 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm leading-6 text-red-900">
+                                {{ $mountain->name }} sedang ditutup, jadi seluruh jalur di bawah ikut ditutup.
+                                @if ($mountain->status_reason) {{ $mountain->status_reason }} @endif
+                            </p>
+                        @endif
+
                         <p class="mb-8 max-w-[60ch] text-[15px] leading-7 text-ink-soft">
                             Jarak dan waktu adalah perkiraan. Cuaca, beban bawaan, dan kebugaran memengaruhi waktu tempuh; mulailah lebih awal dari yang kamu kira perlu.
                         </p>

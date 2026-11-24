@@ -1,8 +1,8 @@
 @php
     
     $ratios = ['4 / 5', '3 / 4', '1 / 1', '4 / 3'];
-    $statusLabels = ['buka' => 'Dibuka', 'tutup' => 'Ditutup', 'dibatasi' => 'Dibatasi'];
-    $statusChips = ['' => 'Semua', 'buka' => 'Dibuka', 'dibatasi' => 'Dibatasi', 'tutup' => 'Ditutup'];
+    $statusLabels = ['buka' => 'Dibuka', 'tutup' => 'Ditutup'];
+    $statusChips = ['' => 'Semua', 'buka' => 'Dibuka', 'tutup' => 'Ditutup'];
 @endphp
 <x-layouts.app
     title="Jelajahi Pegunungan Indonesia"
@@ -118,15 +118,15 @@
                         <li class="mx-item" style="--i: {{ $loop->index }}">
                             <a
                                 class="mx-card"
-                                href="{{ url('/gunung/'.$m->slug) }}"
+                                href="{{ route('mountains.show', $m) }}"
                                 style="--ratio: {{ $ratios[$pick] }}"
                                 data-slug="{{ $m->slug }}"
                                 @if ($photo) data-image="{{ $photo }}" @endif
                             >
                                 <span class="mx-card__media" aria-hidden="true"></span>
 
-                                <span class="mx-card__badge" data-status="{{ $m->current_status }}">
-                                    <i class="dot"></i>{{ $statusLabels[$m->current_status] ?? 'Status belum ada' }}
+                                <span class="mx-card__badge" data-status="{{ $m->status }}">
+                                    <i class="dot"></i>{{ $statusLabels[$m->status] }}
                                 </span>
 
                                 <span class="mx-card__body">

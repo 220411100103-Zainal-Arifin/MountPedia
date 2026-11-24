@@ -3,10 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Mountain;
-use App\Models\Trail;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-
 
 class TrailFactory extends Factory
 {
@@ -28,12 +26,16 @@ class TrailFactory extends Factory
             'duration_down_hours' => round($up * 0.65, 1),
             'difficulty' => fake()->randomElement(['mudah', 'sedang', 'sulit', 'ekstrem']),
             'description' => fake()->paragraph(),
-            'is_active' => true,
+            'status' => Mountain::STATUS_OPEN,
+            'status_reason' => null,
         ];
     }
 
-    public function inactive(): static
+    public function closed(string $reason = 'Jalur ditutup sementara (data contoh)'): static
     {
-        return $this->state(fn () => ['is_active' => false]);
+        return $this->state(fn () => [
+            'status' => Mountain::STATUS_CLOSED,
+            'status_reason' => $reason,
+        ]);
     }
 }

@@ -15,7 +15,7 @@
             ['Dashboard', 'layout-dashboard', route('admin.dashboard'), request()->routeIs('admin.dashboard')],
         ],
         'Master Data' => [
-            ['Gunung & Jalur', 'mountain', route('admin.mountains.index'), request()->routeIs('admin.mountains.*')],
+            ['Gunung & Jalur', 'mountain', route('admin.mountains.index'), request()->routeIs('admin.mountains.*', 'admin.trails.*')],
             ['Gear & Kategori', 'backpack', route('admin.gear.index'), request()->routeIs('admin.gear.*')],
             ['Tempat Sewa', 'store', route('admin.shops.index'), request()->routeIs('admin.shops.*')],
             ['Barang Sewa', 'package', route('admin.items.index'), request()->routeIs('admin.items.*')],
@@ -56,6 +56,7 @@
 
         <nav class="sb__nav">
             @foreach ($menu as $group => $items)
+                <div class="sb__section" style="--n: {{ count($items) }}">
                 <p class="sb__group">{{ $group }}</p>
                 <ul>
                     @foreach ($items as [$label, $icon, $href, $active])
@@ -67,20 +68,9 @@
                         </li>
                     @endforeach
                 </ul>
+                </div>
             @endforeach
         </nav>
-
-        <div class="sb__user">
-            <span class="avatar">{{ $initials }}</span>
-            <span class="sb__user-text">
-                <span class="sb__user-name">{{ $name }}</span>
-                <span class="sb__user-role">Super Admin</span>
-            </span>
-            <form method="POST" action="{{ Route::has('logout') ? route('logout') : '#' }}">
-                @csrf
-                <button class="sb__logout" type="submit" aria-label="Logout" title="Logout"><x-admin.icon name="log-out" /></button>
-            </form>
-        </div>
     </aside>
     <div class="sb-overlay" data-sidebar-close></div>
 
@@ -123,9 +113,30 @@
         </header>
 
         <main class="content">
+            @if (session('success'))
+                <div class="flash flash--success" role="status" data-flash>{{ session('success') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="flash flash--error" role="alert">{{ session('error') }}</div>
+            @endif
+
             {{ $slot }}
         </main>
     </div>
 </div>
+
+    <dialog class="modal" id="confirm-delete" aria-labelledby="cd-title">
+        <form method="POST" class="modal__box" data-delete-form>
+            @csrf
+            @method('DELETE')
+            <span class="modal__icon"><x-admin.icon name="trash-2" /></span>
+            <h2 class="modal__title" id="cd-title">Hapus <span data-delete-name></span>?</h2>
+            <p class="modal__text" data-delete-note></p>
+            <div class="modal__actions">
+                <button class="btn btn--ghost" type="button" data-delete-cancel>Batal</button>
+                <button class="btn btn--danger" type="submit">Ya, hapus</button>
+            </div>
+        </form>
+    </dialog>
 </body>
 </html>

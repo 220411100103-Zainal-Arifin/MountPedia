@@ -6,18 +6,17 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    
     public function run(): void
     {
         $this->call([
             RegionSeeder::class,
             TripTypeSeeder::class,
-            MountainSeeder::class,      
-            GearSeeder::class,          
+            MountainSeeder::class,
+            GearSeeder::class,
             TrailStatusSeeder::class,
             PermitFeeSeeder::class,
-            WeatherSeeder::class,
             RentalShopSeeder::class,
+            AdminSeeder::class,
         ]);
     }
 }

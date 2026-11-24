@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS `mountains` (
   `longitude` DECIMAL(9,6) NULL,
   `managing_authority` VARCHAR(150) NULL,
   `description` TEXT NULL,
-  `weather_area_code` VARCHAR(30) NULL,
   `image_url` VARCHAR(255) NULL,
   `created_at` TIMESTAMP NULL,
   `updated_at` TIMESTAMP NULL,
@@ -132,24 +131,6 @@ CREATE TABLE IF NOT EXISTS `permit_fees` (
     FOREIGN KEY (`trail_id`) REFERENCES `trails` (`id`) ON DELETE SET NULL,
   CONSTRAINT `permit_fees_trip_type_id_foreign`
     FOREIGN KEY (`trip_type_id`) REFERENCES `trip_types` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS `weather_forecasts` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `mountain_id` BIGINT UNSIGNED NOT NULL,
-  `point` ENUM('basecamp','puncak') NOT NULL DEFAULT 'basecamp',
-  `forecast_at` DATETIME NOT NULL,
-  `temp_c` DECIMAL(4,1) NULL,
-  `humidity_pct` TINYINT UNSIGNED NULL,
-  `wind_kmh` DECIMAL(4,1) NULL,
-  `rain_probability_pct` TINYINT UNSIGNED NULL,
-  `condition` VARCHAR(60) NULL,
-  `source` VARCHAR(60) NULL,
-  `fetched_at` DATETIME NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `uq_weather` UNIQUE (`mountain_id`, `point`, `forecast_at`),
-  CONSTRAINT `weather_forecasts_mountain_id_foreign`
-    FOREIGN KEY (`mountain_id`) REFERENCES `mountains` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `gear_categories` (

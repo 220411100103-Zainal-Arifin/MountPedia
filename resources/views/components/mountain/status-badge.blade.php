@@ -1,9 +1,11 @@
-@props(['status' => null, 'tone' => 'light'])
+@props(['status' => 'buka', 'tone' => 'light'])
 
 @php
-    $key = $status ?? '';
-    $label = ['buka' => 'Dibuka', 'dibatasi' => 'Dibatasi', 'tutup' => 'Ditutup'][$key] ?? 'Status belum ada';
-    $dot = ['buka' => 'bg-emerald-400', 'dibatasi' => 'bg-gold', 'tutup' => 'bg-red-400'][$key] ?? 'bg-slate-400';
+    $meta = [
+        'buka' => ['Dibuka', 'bg-emerald-400'],
+        'tutup' => ['Ditutup', 'bg-red-400'],
+    ];
+    [$label, $dot] = $meta[$status] ?? $meta['buka'];
     $tones = [
         'light' => 'bg-pine-100 text-pine-900',
         'dark' => 'bg-black/35 text-white backdrop-blur-md',

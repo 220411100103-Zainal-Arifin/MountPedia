@@ -8,7 +8,6 @@ use App\Models\Region;
 use App\Models\Trail;
 use Illuminate\Database\Seeder;
 
-
 class MountainSeeder extends Seeder
 {
     public function run(): void
@@ -27,7 +26,12 @@ class MountainSeeder extends Seeder
                 'managing_authority' => $row['authority'],
                 'description' => $row['description'],
                 'image_url' => 'https://placehold.co/1200x630?text='.urlencode($row['name']),
-                'weather_area_code' => 'SAMPLE-'.strtoupper($row['slug']),
+
+                // status gunung; 'tutup' menutup seluruh jalurnya (lihat Trail::effective_status)
+                'status' => $row['status'] ?? 'buka',
+                'status_reason' => $row['status_reason'] ?? null,
+                'status_source_url' => isset($row['status_reason']) ? 'https://example.com/pengumuman-pengelola' : null,
+                'status_updated_at' => now(),
             ]);
 
             $trailIds = [];
@@ -37,7 +41,7 @@ class MountainSeeder extends Seeder
                     [
                         'name' => $t['name'],
                         'basecamp_name' => $t['basecamp'],
-                        
+
                         'basecamp_latitude' => round($row['lat'] - 0.04 * ($i + 1), 6),
                         'basecamp_longitude' => round($row['lng'] + 0.03 * ($i + 1), 6),
                         'start_elevation_mdpl' => $t['start'],
@@ -49,7 +53,9 @@ class MountainSeeder extends Seeder
                             'Jalur via %s dengan estimasi %s jam naik dan %s jam turun (data contoh).',
                             $t['basecamp'], $t['up'], $t['down']
                         ),
-                        'is_active' => true,
+                        // status jalur sendiri; berlaku bila gunungnya buka
+                        'status' => $t['status'] ?? 'buka',
+                        'status_reason' => $t['status_reason'] ?? null,
                     ]
                 );
                 $trailIds[$t['slug']] = $trail->id;
@@ -64,7 +70,7 @@ class MountainSeeder extends Seeder
                         'capacity_tents' => $c['tents'],
                         'has_water_source' => $c['water'],
                         'water_note' => $c['water_note'],
-                        
+
                         'latitude' => round($row['lat'] - 0.01 * ($j + 1), 6),
                         'longitude' => round($row['lng'] + 0.01 * ($j + 1), 6),
                         'notes' => $c['notes'] ?? sprintf('Area camp di ketinggian %s mdpl (data contoh).', $c['elevation']),
@@ -168,7 +174,7 @@ class MountainSeeder extends Seeder
                 'description' => 'Gunung di perbatasan Jawa Tengah dan Jawa Timur dengan jalur Cemoro Sewu dan Cemoro Kandang.',
                 'trails' => [
                     ['name' => 'Jalur Cemoro Sewu', 'slug' => 'cemoro-sewu', 'basecamp' => 'Cemoro Sewu', 'start' => 1800, 'km' => 9.0, 'up' => 7.0, 'down' => 5.0, 'difficulty' => 'sedang'],
-                    ['name' => 'Jalur Cemoro Kandang', 'slug' => 'cemoro-kandang', 'basecamp' => 'Cemoro Kandang', 'start' => 1900, 'km' => 10.0, 'up' => 7.5, 'down' => 5.0, 'difficulty' => 'sedang'],
+                    ['name' => 'Jalur Cemoro Kandang', 'slug' => 'cemoro-kandang', 'basecamp' => 'Cemoro Kandang', 'start' => 1900, 'km' => 10.0, 'up' => 7.5, 'down' => 5.0, 'difficulty' => 'sedang', 'status' => 'tutup', 'status_reason' => 'Contoh: perbaikan jalur, jalur lain tetap dibuka (data contoh)'],
                 ],
                 'camps' => [
                     ['name' => 'Sendang Drajat', 'elevation' => 3100, 'tents' => 15, 'water' => true, 'water_note' => 'Sumber air dekat puncak', 'trail' => 'cemoro-sewu'],
@@ -176,6 +182,7 @@ class MountainSeeder extends Seeder
             ],
             [
                 'name' => 'Gunung Rinjani', 'slug' => 'rinjani', 'elevation' => 3726,
+                'status' => 'tutup', 'status_reason' => 'Contoh penutupan sementara; seluruh jalur ikut ditutup (data contoh)',
                 'region' => ['Nusa Tenggara Barat', 'Kabupaten Lombok Timur'],
                 'lat' => -8.411500, 'lng' => 116.457000,
                 'authority' => 'Balai Taman Nasional Gunung Rinjani',
@@ -189,8 +196,7 @@ class MountainSeeder extends Seeder
                     ['name' => 'Danau Segara Anak', 'elevation' => 2000, 'tents' => 100, 'water' => true, 'water_note' => 'Air danau, perlu dimasak/disaring'],
                 ],
             ],
-            
-            
+
             [
                 'name' => 'Gunung Kawi', 'slug' => 'kawi', 'elevation' => 2651,
                 'region' => ['Jawa Timur', 'Kabupaten Malang'],

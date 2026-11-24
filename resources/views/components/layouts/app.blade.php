@@ -1,6 +1,6 @@
 @props([
     'title' => null,
-    'description' => 'Cari gunung, jalur pendakian, status buka/tutup, tarif simaksi, prakiraan cuaca, dan persewaan perlengkapan.',
+    'description' => 'Cari gunung, jalur pendakian, status buka/tutup, tarif simaksi, dan persewaan perlengkapan.',
     'overlay' => false,   
     'footer' => true,
     'assets' => [],       

@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 
 class HomeController extends Controller
 {
-    
     private const FEATURED = ['semeru', 'arjuno', 'panderman', 'penanggungan', 'rinjani'];
 
     public function index()
@@ -24,10 +23,10 @@ class HomeController extends Controller
                 'place' => Str::replaceFirst('Kabupaten ', '', $m->region->regency).', '.$m->region->province,
                 'elevation' => $m->elevation_mdpl,
                 'trails' => $m->trails_count,
-                
-                'status' => $m->statusLogs()->mountainLevel()->activeToday()->orderByDesc('reported_at')->value('status'),
+
+                'status' => $m->status,
                 'description' => Str::limit((string) $m->description, 150),
-                
+
                 'image' => str_contains((string) $m->image_url, 'placehold.co') ? null : $m->image_url,
                 'url' => url('/gunung/'.$m->slug),
             ]);

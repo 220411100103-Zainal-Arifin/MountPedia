@@ -22,7 +22,12 @@ return new class extends Migration
             $table->decimal('duration_down_hours', 4, 1)->nullable();
             $table->enum('difficulty', ['mudah', 'sedang', 'sulit', 'ekstrem'])->nullable();
             $table->text('description')->nullable();
-            $table->boolean('is_active')->default(true);
+
+            // Status jalur sendiri. Dipakai hanya bila gunungnya 'buka';
+            // bila gunung 'tutup', jalur dianggap tutup (lihat Trail::effective_status).
+            $table->enum('status', ['buka', 'tutup'])->default('buka');
+            $table->string('status_reason')->nullable();
+
             $table->timestamps();
 
             $table->unique(['mountain_id', 'slug'], 'uq_trails_slug');

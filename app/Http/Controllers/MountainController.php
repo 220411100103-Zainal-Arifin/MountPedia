@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\GearRecommendation;
 use App\Models\Mountain;
 use App\Models\Region;
-use App\Models\TrailStatusLog;
+use App\Services\OpenMeteo;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class MountainController extends Controller
@@ -22,7 +22,7 @@ class MountainController extends Controller
         '3000-9999' => [3000, 9999, '3.000 mdpl ke atas'],
     ];
 
-    private const STATUSES = ['buka', 'dibatasi', 'tutup'];
+    private const STATUSES = ['buka', 'tutup'];
 
     public function index(Request $request)
     {
@@ -39,20 +39,8 @@ class MountainController extends Controller
             'status' => is_string($status) && in_array($status, self::STATUSES, true) ? $status : '',
         ];
 
-        // Status terkini tingkat gunung (periode mencakup hari ini, laporan terbaru).
-        // Dipakai dua kali: sebagai kolom `current_status` dan sebagai syarat filter.
-        $currentStatus = fn () => TrailStatusLog::query()
-            ->select('status')
-            ->whereColumn((new TrailStatusLog)->qualifyColumn('mountain_id'), (new Mountain)->qualifyColumn('id'))
-            ->mountainLevel()
-            ->activeToday()
-            ->orderByDesc('reported_at')
-            ->limit(1);
-
         $mountains = Mountain::query()
             ->with('region')
-            ->withCount('trails')
-            ->addSelect(['current_status' => $currentStatus()])
             ->when($filters['q'] !== '', function ($query) use ($filters) {
                 $like = '%'.addcslashes($filters['q'], '%_\\').'%';
 
@@ -65,7 +53,7 @@ class MountainController extends Controller
             ->when($filters['mdpl'] !== '', fn ($query) => $query
                 ->whereBetween('elevation_mdpl', array_slice(self::ELEVATION_RANGES[$filters['mdpl']], 0, 2)))
             ->when($filters['status'] !== '', fn ($query) => $query
-                ->where($currentStatus(), '=', $filters['status']))
+                ->where('status', $filters['status']))
             ->orderBy('name')
             ->paginate(self::PER_PAGE)
             ->withQueryString();
@@ -94,30 +82,27 @@ class MountainController extends Controller
     {
         $mountain->load([
             'region',
-            'trails' => fn ($q) => $q->where('is_active', true)->orderBy('name'),
+            'trails' => fn ($q) => $q->orderBy('name'),
             'trails.campsites',
             'campsites' => fn ($q) => $q->orderBy('elevation_mdpl'),
             'photos',
         ]);
 
-        // Status terkini: tingkat gunung, dan tingkat jalur (menimpa status gunung untuk jalur itu)
-        $status = $mountain->statusLogs()->mountainLevel()->activeToday()
-            ->orderByDesc('reported_at')->first();
-
-        $trailStatuses = $mountain->statusLogs()->whereNotNull('trail_id')->activeToday()
-            ->orderByDesc('reported_at')->get()
-            ->unique('trail_id')->keyBy('trail_id');
-
-        // Prakiraan terdekat per titik (basecamp / puncak)
-        $weather = $mountain->weatherForecasts()
-            ->where('forecast_at', '>=', now()->subHours(3))
-            ->orderBy('forecast_at')->get()
-            ->groupBy('point')->map(fn (Collection $g) => $g->first());
+        // status jalur yang berlaku dihitung dari gunungnya: gunung tutup => semua jalur tutup
+        $mountain->trails->each->setRelation('mountain', $mountain);
+        $trailStatuses = $mountain->trails->mapWithKeys(fn ($t) => [$t->id => (object) [
+            'status' => $t->effective_status,
+            'reason' => $t->effective_status_reason,
+            'starts_on' => null,
+            'ends_on' => null,
+            'source_name' => null,
+            'source_url' => null,
+            'reported_at' => null,
+        ]]);
 
         // Rekomendasi: provinsi yang sama lebih dulu, lalu ketinggian yang paling berdekatan
         $related = Mountain::query()
             ->with('region')
-            ->withCurrentStatus()
             ->whereKeyNot($mountain->id)
             ->orderByRaw('CASE WHEN region_id IN (SELECT id FROM regions WHERE province = ?) THEN 0 ELSE 1 END', [$mountain->region->province])
             ->orderByRaw('ABS(CAST(elevation_mdpl AS SIGNED) - ?)', [$mountain->elevation_mdpl])
@@ -127,18 +112,32 @@ class MountainController extends Controller
         return view('gunung.show', [
             'mountain' => $mountain,
             'heroPhoto' => $this->realImage($mountain->image_url),
-            'status' => $status,
             'trailStatuses' => $trailStatuses,
             'stats' => $this->stats($mountain),
             'overview' => $this->overview($mountain->description),
             'permit' => $this->permit($mountain),
-            'weather' => $weather,
             'mapPoints' => $this->mapPoints($mountain),
             'sharedCamps' => $mountain->campsites->whereNull('trail_id')->values(),
             'gear' => $this->gear($mountain),
             'related' => $related,
             'jsonLd' => $this->jsonLd($mountain),
         ]);
+    }
+
+    /**
+     * Prakiraan cuaca (JSON) untuk satu gunung, diambil dari Open-Meteo lewat server
+     * supaya hasilnya bisa di-cache dan pengunjung tidak memanggil API pihak ketiga langsung.
+     * Halaman memuatnya setelah tampil, jadi gangguan Open-Meteo tidak memperlambat halaman.
+     */
+    public function weather(Mountain $mountain, OpenMeteo $openMeteo): JsonResponse
+    {
+        $data = $openMeteo->forMountain($mountain);
+
+        if ($data === null) {
+            return response()->json(['message' => 'Data cuaca belum dapat dimuat.'], 503);
+        }
+
+        return response()->json($data)->header('Cache-Control', 'public, max-age=300');
     }
 
     /** image_url dari seeder hanya placeholder; abaikan agar halaman memakai ilustrasi bawaan. */
@@ -359,9 +358,12 @@ class MountainController extends Controller
                     'qty' => $r->quantity_note,
                     'note' => $r->notes,
                     'specific' => $r->mountain_id !== null,
-                    'url' => $r->gearItem->rental_items_count > 0
-                        ? url('/perlengkapan').'?'.http_build_query(['q' => $r->gearItem->name])
-                        : null,
+                    // halaman detail bila barang punya slug; bila tidak, pencarian di daftar (hanya jika ada item sewa)
+                    'url' => filled($r->gearItem->slug)
+                        ? route('gear.show', $r->gearItem->slug)
+                        : ($r->gearItem->rental_items_count > 0
+                            ? route('gear.index', ['q' => $r->gearItem->name])
+                            : null),
                 ])
                 ->sort(fn ($a, $b) => [$a['category_order'], $rank[$a['priority']] ?? 9, $a['name']]
                     <=> [$b['category_order'], $rank[$b['priority']] ?? 9, $b['name']])

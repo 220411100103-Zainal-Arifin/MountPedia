@@ -8,6 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::dropIfExists('weather_forecasts');
+    }
+
+    public function down(): void
+    {
         Schema::create('weather_forecasts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('mountain_id')->constrained('mountains')->cascadeOnDelete();
@@ -20,13 +25,7 @@ return new class extends Migration
             $table->string('condition', 60)->nullable();
             $table->string('source', 60)->nullable();
             $table->dateTime('fetched_at');
-
             $table->unique(['mountain_id', 'point', 'forecast_at'], 'uq_weather');
         });
-    }
-
-    public function down(): void
-    {
-        Schema::dropIfExists('weather_forecasts');
     }
 };

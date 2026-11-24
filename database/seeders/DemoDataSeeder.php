@@ -10,10 +10,8 @@ use App\Models\Region;
 use App\Models\RentalItem;
 use App\Models\RentalShop;
 use App\Models\Trail;
-use App\Models\TrailStatusLog;
 use App\Models\TripType;
 use Illuminate\Database\Seeder;
-
 
 class DemoDataSeeder extends Seeder
 {
@@ -36,14 +34,6 @@ class DemoDataSeeder extends Seeder
                 ->for($mountain)
                 ->state(fn () => ['trail_id' => $trails->random()->id])
                 ->create();
-
-            
-            $log = TrailStatusLog::factory()->for($mountain);
-            match (fake()->numberBetween(1, 10)) {
-                1 => $log->closed()->create(),
-                2, 3 => $log->restricted()->create(),
-                default => $log->create(),
-            };
 
             foreach ($tripTypes as $trip) {
                 foreach (['wni', 'wna'] as $visitor) {
@@ -79,6 +69,5 @@ class DemoDataSeeder extends Seeder
             }
         }
 
-        $this->call(WeatherSeeder::class);
     }
 }

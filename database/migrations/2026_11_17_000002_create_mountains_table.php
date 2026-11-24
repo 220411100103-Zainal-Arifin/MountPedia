@@ -18,14 +18,21 @@ return new class extends Migration
             $table->decimal('longitude', 9, 6)->nullable();
             $table->string('managing_authority', 150)->nullable();
             $table->text('description')->nullable();
-            $table->string('weather_area_code', 30)->nullable();
             $table->string('image_url')->nullable();
+
+            // Status pendakian tingkat gunung. 'tutup' otomatis menutup seluruh jalur.
+            $table->enum('status', ['buka', 'tutup'])->default('buka');
+            $table->string('status_reason')->nullable();
+            $table->string('status_source_url')->nullable();
+            $table->timestamp('status_updated_at')->nullable();
+
             $table->timestamps();
 
             if (in_array(Schema::getConnection()->getDriverName(), ['mysql', 'mariadb', 'pgsql'])) {
                 $table->fullText('name', 'ft_mountains_name');
             }
             $table->index('elevation_mdpl', 'idx_mountains_elevation');
+            $table->index('status', 'idx_mountains_status');
         });
     }
 
